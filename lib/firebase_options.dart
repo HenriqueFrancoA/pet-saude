@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,16 +49,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCEC2z-UjnwgVaBff2iG6Lpk6DFaJfEILw',
-    appId: '1:541319243298:web:ae12ff65b3d698c18b8c7b',
-    messagingSenderId: '541319243298',
-    projectId: 'pet-care-85209',
-    authDomain: 'pet-care-85209.firebaseapp.com',
-    storageBucket: 'pet-care-85209.appspot.com',
-    measurementId: 'G-WEGM96W3ME',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCvDhc4XoMfFOhgzprP9pQGLtpHz8mOmew',
     appId: '1:541319243298:android:bd189e3516ef4d7f8b8c7b',
@@ -62,17 +58,6 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBxtBnZpHoVQXRwP4d0WHUG9yeA5f-PMcU',
-    appId: '1:541319243298:ios:3046d054b28c5b148b8c7b',
-    messagingSenderId: '541319243298',
-    projectId: 'pet-care-85209',
-    storageBucket: 'pet-care-85209.appspot.com',
-    androidClientId: '541319243298-okc31usl5jchgpek36ps9p9dpnsiurba.apps.googleusercontent.com',
-    iosClientId: '541319243298-redu97iseoumc8f3ggnalk7cb45rr9r7.apps.googleusercontent.com',
-    iosBundleId: 'com.example.petCare',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBxtBnZpHoVQXRwP4d0WHUG9yeA5f-PMcU',
     appId: '1:541319243298:ios:3046d054b28c5b148b8c7b',
     messagingSenderId: '541319243298',

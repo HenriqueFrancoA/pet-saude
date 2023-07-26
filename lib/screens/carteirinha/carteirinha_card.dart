@@ -1,75 +1,145 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pet_care/screens/cadastro/Cadastro_pet_screen.dart';
-import 'package:pet_care/screens/informacoes/pet_info_screen.dart';
+import 'package:intl/intl.dart';
+import 'package:pet_care/components/glassmorphic_component.dart';
+import 'package:pet_care/models/vacinas.dart';
+import 'package:pet_care/models/vermifugos.dart';
+import 'package:sizer/sizer.dart';
 
 class CarteirinhaCard extends StatefulWidget {
-  final String nome;
-  final String data;
-  final String dataProxima;
-  const CarteirinhaCard({
+  Vermifugos? vermifugo;
+  Vacinas? vacina;
+  CarteirinhaCard({
     Key? key,
-    required this.nome,
-    required this.data,
-    required this.dataProxima,
+    this.vermifugo,
+    this.vacina,
   }) : super(key: key);
 
   @override
-  _CarteirinhaCardState createState() => _CarteirinhaCardState();
+  CarteirinhaCardState createState() => CarteirinhaCardState();
 }
 
-class _CarteirinhaCardState extends State<CarteirinhaCard> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class CarteirinhaCardState extends State<CarteirinhaCard> {
+  late Reference storageRef;
+  RxString downloadURL = ''.obs;
 
   @override
   Widget build(BuildContext context) {
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
 
-    return Container(
+    return CustomGlassmorphicContainer(
       width: queryData.size.width,
-      height: 110,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      padding: const EdgeInsets.all(15),
-      child: Row(
-        children: [
-          Column(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                color: Colors.grey,
-              ),
-            ],
-          ),
-          const SizedBox(
-            width: 15,
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.nome,
-                style: Theme.of(context).textTheme.headline4,
-              ),
-              Text(
-                "Data: ${widget.data}",
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              Text(
-                "Próxima: ${widget.dataProxima}",
-                style: Theme.of(context).textTheme.headline5,
-              ),
-            ],
-          ),
-        ],
+      height: 150,
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: widget.vermifugo != null &&
+                          (widget.vermifugo!.localImagem != null &&
+                              widget.vermifugo!.localImagem!.isNotEmpty)
+                      ? Image.file(
+                          File(widget.vermifugo!.localImagem!),
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.contain,
+                        )
+                      : widget.vacina != null &&
+                              (widget.vacina!.localImagem != null &&
+                                  widget.vacina!.localImagem!.isNotEmpty)
+                          ? Image.file(
+                              File(widget.vacina!.localImagem!),
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.contain,
+                            )
+                          : widget.vacina != null
+                              ? Image.asset(
+                                  "assets/image/vacina.jpg",
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  "assets/image/vermifugo.jpg",
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                ),
+                ),
+              ],
+            ),
+            SizedBox(
+              width: 2.h,
+            ),
+            widget.vermifugo != null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.vermifugo!.nome!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        "Peso: ${widget.vermifugo!.peso} kg",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        "Dose: ${widget.vermifugo!.dose} ml",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        DateFormat('\'Data: \' dd \'de\' MMM yyyy', 'pt_BR')
+                            .format(widget.vermifugo!.dataVacinacao!.toDate()),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        DateFormat('\'Próxima: \' dd \'de\' MMM yyyy', 'pt_BR')
+                            .format(
+                                widget.vermifugo!.proximaVacinacao!.toDate()),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.vacina!.nome!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        "Peso: ${widget.vacina!.peso} kg",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        "Dose: ${widget.vacina!.dose} ml",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        DateFormat('\'Data: \' dd \'de\' MMM yyyy', 'pt_BR')
+                            .format(widget.vacina!.dataVacinacao!.toDate()),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        DateFormat('\'Próxima: \' dd \'de\' MMM yyyy', 'pt_BR')
+                            .format(widget.vacina!.proximaVacinacao!.toDate()),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+          ],
+        ),
       ),
     );
   }

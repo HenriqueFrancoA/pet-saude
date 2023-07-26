@@ -1,25 +1,19 @@
-import 'dart:ffi';
 import 'dart:io';
-import 'dart:ui';
 
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:get/get.dart';
-import 'package:pet_care/screens/firstAcess/first_acess_screen.dart';
-import 'package:pet_care/screens/pets/pets_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pet_care/services/auth_services.dart';
 import 'package:sizer/sizer.dart';
-import 'package:lottie/lottie.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
@@ -36,114 +30,101 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: Center(
           child: Container(
-            padding: const EdgeInsets.all(30),
             height: queryData.size.height,
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 50,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                  'assets/image/background-image.jpg',
                 ),
-                Text(
-                  "BEM VINDX AO",
-                  style: Theme.of(context).textTheme.headline1,
-                ),
-                Text(
-                  "PET CARE",
-                  style: Theme.of(context).textTheme.headline1,
-                ),
-                Image.asset(
-                  "assets/image/auau.jpg",
-                  height: 230,
-                  width: 230,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Text(
-                  "FAÇA LOGIN PARA COMEÇAR",
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-                Container(
-                  margin: const EdgeInsets.only(
-                    top: 20,
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Container(
+              color: const Color.fromARGB(125, 0, 0, 0),
+              padding: const EdgeInsets.all(30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(
+                    Ionicons.paw,
+                    color: Colors.white,
+                    size: 50,
                   ),
-                  height: 50,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      backgroundColor: const Color.fromRGBO(66, 103, 178, 1),
-                    ),
-                    onPressed: () async {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Text(
-                          "f",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            fontSize: 30,
-                          ),
-                        ),
-                        Text(
-                          "ENTRAR COM FACEBOOK",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 12.sp,
-                          ),
+                  SizedBox(
+                    height: 1.h,
+                  ),
+                  Text(
+                    "PET SAÚDE",
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 45,
+                      shadows: const [
+                        Shadow(
+                          offset: Offset(3.0, 3.0),
+                          color: Color.fromARGB(255, 109, 65, 29),
+                          blurRadius: 5.0,
                         ),
                       ],
                     ),
                   ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(
-                    top: 20,
+                  SizedBox(
+                    height: 4.h,
                   ),
-                  height: 50,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+                  Text(
+                    "Faça login para começar",
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  SizedBox(
+                    height: 1.h,
+                  ),
+                  SizedBox(
+                    width: queryData.size.width,
+                    child: MaterialButton(
+                      onPressed: () {
+                        try {
+                          AuthService().signInWithGoogle();
+                        } catch (e) {
+                          null;
+                        }
+                      },
+                      color: Colors.red,
+                      child: Row(
+                        children: [
+                          Text(
+                            "g\t\t",
+                            style: GoogleFonts.abhayaLibre(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red[900],
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 40,
+                            color: Colors.black38,
+                          ),
+                          SizedBox(
+                            width: 4.h,
+                          ),
+                          Text(
+                            "\t\t ENTRAR COM GMAIL",
+                            style:
+                                Theme.of(context).textTheme.bodySmall!.copyWith(
+                                      fontSize: 16,
+                                    ),
+                          ),
+                        ],
                       ),
-                      backgroundColor: const Color.fromRGBO(219, 68, 55, 1),
-                    ),
-                    onPressed: () async {
-                      try {
-                        AuthService().signInWithGoogle();
-                      } catch (e) {
-                        null;
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Text(
-                          "G",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            fontSize: 30,
-                          ),
-                        ),
-                        Text(
-                          "ENTRAR COM GOOGLE",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 12.sp,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

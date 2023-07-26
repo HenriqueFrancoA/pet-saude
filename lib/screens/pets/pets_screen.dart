@@ -3,20 +3,25 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
+import 'package:pet_care/components/glassmorphic_component.dart';
+import 'package:pet_care/controllers/login_controller.dart';
+import 'package:pet_care/controllers/pets_controller.dart';
+import 'package:pet_care/models/pets.dart';
 import 'package:pet_care/screens/pets/card_pet.dart';
+import 'package:sizer/sizer.dart';
 
 class PetsScreen extends StatefulWidget {
   const PetsScreen({Key? key}) : super(key: key);
 
   @override
-  _PetsScreenState createState() => _PetsScreenState();
+  PetsScreenState createState() => PetsScreenState();
 }
 
-class _PetsScreenState extends State<PetsScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class PetsScreenState extends State<PetsScreen> {
+  final loginController = Get.put(LoginController());
+  final petsController = Get.put(PetsController());
 
   @override
   Widget build(BuildContext context) {
@@ -29,51 +34,95 @@ class _PetsScreenState extends State<PetsScreen> {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        body: Center(
-          child: Container(
-            padding: const EdgeInsets.all(50),
-            width: queryData.size.width,
-            color: Theme.of(context).colorScheme.primary,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: queryData.size.height * 0.2,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Pets do ",
-                        style: Theme.of(context).textTheme.headline2,
-                      ),
-                      const Icon(
-                        Ionicons.heart,
-                        color: Colors.red,
-                        size: 45,
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisExtent: 200,
-                      ),
-                      itemCount: 2,
-                      shrinkWrap: true,
-                      itemBuilder: (ctx, index) {
-                        return CardPet(
-                          index: index,
-                        );
-                      },
-                    ),
-                  ),
-                ],
+        backgroundColor: Colors.black,
+        body: CustomGlassmorphicContainer(
+          width: queryData.size.width,
+          height: queryData.size.height,
+          borderRadius: 10,
+          child: Stack(
+            children: [
+              Opacity(
+                opacity: 0.5,
+                child: LottieBuilder.asset(
+                  "assets/image/wpp.json",
+                  width: queryData.size.width,
+                  height: queryData.size.height,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
+              SizedBox(
+                width: queryData.size.width,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "QUEM É O BOM GAROTO(A)?",
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Container(
+                      height: queryData.size.height * 0.65,
+                      margin: const EdgeInsets.all(10),
+                      child: Obx(
+                        () => petsController.pets.isNotEmpty
+                            ? GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 10,
+                                  mainAxisExtent: 200,
+                                ),
+                                itemCount: petsController.pets.length + 1,
+                                shrinkWrap: true,
+                                itemBuilder: (ctx, index) {
+                                  if (index < petsController.pets.length) {
+                                    Pets pet = petsController.pets[index];
+                                    return CardPet(
+                                      pet: pet,
+                                      ultimo: false,
+                                    );
+                                  } else {
+                                    return CardPet(
+                                      pet: null,
+                                      ultimo: true,
+                                    );
+                                  }
+                                },
+                              )
+                            : CardPet(
+                                pet: null,
+                                ultimo: true,
+                              ),
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        const Icon(
+                          Ionicons.paw,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        SizedBox(
+                          height: 1.h,
+                        ),
+                        Text(
+                          "PET SAÚDE",
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

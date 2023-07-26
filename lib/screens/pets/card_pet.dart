@@ -1,85 +1,100 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pet_care/screens/cadastro/Cadastro_pet_screen.dart';
-import 'package:pet_care/screens/informacoes/pet_info_screen.dart';
+import 'package:pet_care/components/glassmorphic_component.dart';
+import 'package:pet_care/models/pets.dart';
+import 'package:sizer/sizer.dart';
 
 class CardPet extends StatefulWidget {
-  final int index;
-  const CardPet({
+  Pets? pet;
+  bool ultimo;
+  CardPet({
     Key? key,
-    required this.index,
+    this.pet,
+    required this.ultimo,
   }) : super(key: key);
 
   @override
-  _CardPetState createState() => _CardPetState();
+  CardPetState createState() => CardPetState();
 }
 
-class _CardPetState extends State<CardPet> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class CardPetState extends State<CardPet> {
+  late Reference storageRef;
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    queryData = MediaQuery.of(context);
-
-    return widget.index < 1
+    return !widget.ultimo
         ? Column(
             children: [
               GestureDetector(
-                child: Container(
+                child: CustomGlassmorphicContainer(
                   width: 140,
                   height: 140,
-                  margin: const EdgeInsets.all(10),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      "assets/image/cao.jpg",
-                      height: 150,
-                      fit: BoxFit.cover,
-                    ),
+                    borderRadius: BorderRadius.circular(15),
+                    child: widget.pet!.localImagem != null &&
+                            widget.pet!.localImagem!.isNotEmpty
+                        ? Image.file(
+                            File(widget.pet!.localImagem!),
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset(
+                            "assets/image/pet.png",
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
                 onTap: () {
-                  Get.offAll(const PetInfoScreen());
+                  Get.toNamed("/info", arguments: {'pet': widget.pet});
                 },
               ),
+              SizedBox(
+                height: 1.h,
+              ),
               Text(
-                "BILLY",
-                style: Theme.of(context).textTheme.bodyText1,
+                widget.pet!.nome!.length <= 10
+                    ? widget.pet!.nome!.toUpperCase()
+                    : "${widget.pet!.nome!.substring(0, 10).toUpperCase()}...",
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
               ),
             ],
           )
         : Column(
             children: [
               GestureDetector(
-                child: Container(
+                child: const CustomGlassmorphicContainer(
                   width: 140,
                   height: 140,
-                  margin: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                   child: Center(
                     child: Icon(
                       Icons.add_circle,
-                      size: 50,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      size: 40,
+                      color: Colors.white,
                     ),
                   ),
                 ),
                 onTap: () {
-                  Get.offAll(
-                    const CadastroPetScreen(),
-                  );
+                  Get.toNamed("/cadastro", arguments: {'pet': null});
                 },
+              ),
+              SizedBox(
+                height: 1.h,
               ),
               Text(
                 "NOVO PET",
-                style: Theme.of(context).textTheme.bodyText1,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
               ),
             ],
           );

@@ -1,23 +1,16 @@
-import 'dart:ffi';
 import 'dart:io';
-import 'dart:ui';
 
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
-import 'package:pet_care/screens/cadastro/Cadastro_pet_screen.dart';
-import 'package:sizer/sizer.dart';
-import 'package:lottie/lottie.dart';
 
 class FirstAcessScreen extends StatefulWidget {
   const FirstAcessScreen({Key? key}) : super(key: key);
 
   @override
-  _FirstAcessScreenState createState() => _FirstAcessScreenState();
+  FirstAcessScreenState createState() => FirstAcessScreenState();
 }
 
-class _FirstAcessScreenState extends State<FirstAcessScreen> {
+class FirstAcessScreenState extends State<FirstAcessScreen> {
   @override
   void initState() {
     super.initState();
@@ -46,11 +39,11 @@ class _FirstAcessScreenState extends State<FirstAcessScreen> {
                 ),
                 Text(
                   "QUAL PET",
-                  style: Theme.of(context).textTheme.headline2,
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
                 Text(
                   "VOCÊ TEM?",
-                  style: Theme.of(context).textTheme.headline2,
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
                 const SizedBox(
                   height: 20,
@@ -71,7 +64,7 @@ class _FirstAcessScreenState extends State<FirstAcessScreen> {
                         children: [
                           Text(
                             "CÃO",
-                            style: Theme.of(context).textTheme.headline1,
+                            style: Theme.of(context).textTheme.labelSmall,
                           ),
                           const SizedBox(
                             width: 15,
@@ -85,7 +78,7 @@ class _FirstAcessScreenState extends State<FirstAcessScreen> {
                     ],
                   ),
                   onTap: () {
-                    Get.offAll(const CadastroPetScreen());
+                    Get.offAllNamed("/cadastro");
                   },
                 ),
                 const SizedBox(
@@ -115,7 +108,7 @@ class _FirstAcessScreenState extends State<FirstAcessScreen> {
                         ),
                         Text(
                           "GATO",
-                          style: Theme.of(context).textTheme.headline2,
+                          style: Theme.of(context).textTheme.labelSmall,
                         ),
                       ],
                     ),
