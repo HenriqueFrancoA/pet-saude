@@ -31,7 +31,7 @@ class PetsScreenState extends State<PetsScreen> {
     myBanner = BannerAd(
       size: AdSize.banner,
       adUnitId:
-          'ca-app-pub-3940256099942544/6300978111', //ca-app-pub-4824022930012497/6424498738
+          'ca-app-pub-4824022930012497/6424498738', // test: 'ca-app-pub-3940256099942544/6300978111', //ca-app-pub-4824022930012497/6424498738
       listener: BannerAdListener(
         onAdClosed: (ad) {
           anuncio.value = false;

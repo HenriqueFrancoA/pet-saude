@@ -29,7 +29,7 @@ class PetInfoScreenState extends State<PetInfoScreen> {
   void initState() {
     myBanner = BannerAd(
       size: AdSize.fluid,
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      adUnitId: 'ca-app-pub-4824022930012497/6424498738',
       listener: BannerAdListener(
         onAdClosed: (ad) {
           setState(() {
