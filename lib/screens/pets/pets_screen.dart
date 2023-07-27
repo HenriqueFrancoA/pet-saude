@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/controllers/login_controller.dart';
@@ -22,6 +23,26 @@ class PetsScreen extends StatefulWidget {
 class PetsScreenState extends State<PetsScreen> {
   final loginController = Get.put(LoginController());
   final petsController = Get.put(PetsController());
+  RxBool anuncio = RxBool(true);
+  late final BannerAd myBanner;
+
+  @override
+  void initState() {
+    myBanner = BannerAd(
+      size: AdSize.banner,
+      adUnitId:
+          'ca-app-pub-3940256099942544/6300978111', //ca-app-pub-4824022930012497/6424498738
+      listener: BannerAdListener(
+        onAdClosed: (ad) {
+          anuncio.value = false;
+        },
+      ),
+      request: const AdRequest(),
+    );
+
+    myBanner.load();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,12 +140,25 @@ class PetsScreenState extends State<PetsScreen> {
                         ),
                       ],
                     ),
+                    SizedBox(
+                      height: 1.h,
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
+        bottomSheet: anuncio.isTrue
+            ? Container(
+                width: queryData.size.width,
+                height: 50,
+                color: Colors.black,
+                child: AdWidget(
+                  ad: myBanner,
+                ),
+              )
+            : null,
       ),
     );
   }

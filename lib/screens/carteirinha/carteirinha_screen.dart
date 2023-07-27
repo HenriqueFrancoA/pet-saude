@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/controllers/vacinas_controller.dart';
@@ -25,35 +26,25 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
 
   final vacinasController = Get.put(VacinasController());
   final vermifugosController = Get.put(VermifugosController());
-
-  RxList<Vacinas> listVacinas = RxList();
-  RxList<Vermifugos> listVermifugos = RxList();
+  RxBool anuncio = RxBool(true);
+  late final BannerAd myBanner;
 
   @override
   void initState() {
-    listVacinas.clear();
-    listVermifugos.clear();
-    if (!titulo.contains("VERMÍFUGOS")) {
-      for (Vacinas vac in vacinasController.vacinas) {
-        if (vac.pet!.id == pet.id) {
-          // Verificar se a vacina já existe na lista antes de adicioná-la
-          bool alreadyExists = listVacinas.any((v) => v.id == vac.id);
-          if (!alreadyExists) {
-            listVacinas.add(vac);
-          }
-        }
-      }
-    } else {
-      for (Vermifugos ver in vermifugosController.vermifugos) {
-        if (ver.pet!.id == pet.id) {
-          // Verificar se o vermífugo já existe na lista antes de adicioná-lo
-          bool alreadyExists = listVermifugos.any((v) => v.id == ver.id);
-          if (!alreadyExists) {
-            listVermifugos.add(ver);
-          }
-        }
-      }
-    }
+    myBanner = BannerAd(
+      size: AdSize.fluid,
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      listener: BannerAdListener(
+        onAdClosed: (ad) {
+          setState(() {
+            anuncio.value = false;
+          });
+        },
+      ),
+      request: const AdRequest(),
+    );
+
+    myBanner.load();
     super.initState();
   }
 
@@ -124,32 +115,32 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.all(15),
+                    height: queryData.size.height * 0.9,
                     child: Obx(
-                      () => Expanded(
-                        child: ListView.separated(
-                          itemCount: titulo.contains("VERMÍFUGOS")
-                              ? listVermifugos.length
-                              : listVacinas.length,
-                          shrinkWrap: true,
-                          itemBuilder: (ctx, index) {
-                            Vermifugos? vermifugo;
-                            Vacinas? vacina;
-                            if (titulo.contains("VERMÍFUGOS")) {
-                              vermifugo = listVermifugos[index];
-                            } else {
-                              vacina = listVacinas[index];
-                            }
-                            return CarteirinhaCard(
-                              vermifugo: vermifugo,
-                              vacina: vacina,
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) {
-                            return SizedBox(
-                              height: 2.h,
-                            );
-                          },
-                        ),
+                      () => ListView.separated(
+                        itemCount: titulo.contains("VERMÍFUGOS")
+                            ? vermifugosController.vermifugosPet.length
+                            : vacinasController.vacinasPet.length,
+                        shrinkWrap: true,
+                        itemBuilder: (ctx, index) {
+                          Vermifugos? vermifugo;
+                          Vacinas? vacina;
+                          if (titulo.contains("VERMÍFUGOS")) {
+                            vermifugo =
+                                vermifugosController.vermifugosPet[index];
+                          } else {
+                            vacina = vacinasController.vacinasPet[index];
+                          }
+                          return CarteirinhaCard(
+                            vermifugo: vermifugo,
+                            vacina: vacina,
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return SizedBox(
+                            height: 2.h,
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -158,6 +149,16 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
             ],
           ),
         ),
+        bottomSheet: anuncio.isTrue
+            ? Container(
+                width: queryData.size.width,
+                height: 50,
+                color: Colors.black,
+                child: AdWidget(
+                  ad: myBanner,
+                ),
+              )
+            : null,
       ),
     );
   }

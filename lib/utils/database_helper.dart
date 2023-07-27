@@ -29,6 +29,7 @@ class DatabaseHelper {
         id TEXT PRIMARY KEY,
         nome TEXT,
         raca TEXT,
+        sexo TEXT,
         nascimento TEXT,
         peso TEXT,
         imagem TEXT,

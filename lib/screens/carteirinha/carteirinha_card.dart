@@ -86,15 +86,20 @@ class CarteirinhaCardState extends State<CarteirinhaCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.vermifugo!.nome!,
+                        widget.vermifugo!.nome!.length <= 30
+                            ? widget.vermifugo!.nome!
+                            : "${widget.vermifugo!.nome!.substring(0, 30)}...",
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                      ),
+                      Text(
+                        "Peso: ${widget.vermifugo!.peso!.toStringAsFixed(2)} kg",
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       Text(
-                        "Peso: ${widget.vermifugo!.peso} kg",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      Text(
-                        "Dose: ${widget.vermifugo!.dose} ml",
+                        "Dose: ${widget.vermifugo!.dose!.toStringAsFixed(2)} ml",
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       Text(

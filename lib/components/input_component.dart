@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -72,6 +73,16 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
+      inputFormatters: keyboardType == TextInputType.number
+          ? [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]+')),
+              TextInputFormatter.withFunction((oldValue, newValue) {
+                // Replace commas with dots to handle decimal values
+                return newValue.copyWith(
+                    text: newValue.text.replaceAll(',', '.'));
+              }),
+            ]
+          : null,
       onFieldSubmitted: onSubmitted,
       validator: validator ??
           (value) {

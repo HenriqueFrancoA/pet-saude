@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
@@ -20,6 +21,28 @@ class PetInfoScreen extends StatefulWidget {
 
 class PetInfoScreenState extends State<PetInfoScreen> {
   final pet = Get.arguments['pet'] as Pets;
+
+  RxBool anuncio = RxBool(true);
+  late final BannerAd myBanner;
+
+  @override
+  void initState() {
+    myBanner = BannerAd(
+      size: AdSize.fluid,
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      listener: BannerAdListener(
+        onAdClosed: (ad) {
+          setState(() {
+            anuncio.value = false;
+          });
+        },
+      ),
+      request: const AdRequest(),
+    );
+
+    myBanner.load();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +91,12 @@ class PetInfoScreenState extends State<PetInfoScreen> {
                           child: IconButton(
                             icon: const Icon(
                               Icons.arrow_back,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black,
+                                  blurRadius: 5,
+                                ),
+                              ],
                             ),
                             color: Colors.white,
                             iconSize: 35,
@@ -160,7 +189,7 @@ class PetInfoScreenState extends State<PetInfoScreen> {
                                     height: 2.h,
                                   ),
                                   Text(
-                                    "${pet.peso!} Kg",
+                                    "${pet.peso!.toStringAsFixed(2)}Kg",
                                     style:
                                         Theme.of(context).textTheme.labelSmall,
                                   ),
@@ -273,6 +302,16 @@ class PetInfoScreenState extends State<PetInfoScreen> {
             ],
           ),
         ),
+        bottomSheet: anuncio.isTrue
+            ? Container(
+                width: queryData.size.width,
+                height: 50,
+                color: Colors.black,
+                child: AdWidget(
+                  ad: myBanner,
+                ),
+              )
+            : null,
       ),
     );
   }

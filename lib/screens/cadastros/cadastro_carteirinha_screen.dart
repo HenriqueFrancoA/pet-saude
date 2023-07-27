@@ -73,13 +73,53 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
     }
   }
 
-  Future<String> saveToLocalFile(File imageFile, String idPet) async {
-    Directory? appDocumentsDirectory = await getExternalStorageDirectory();
-    String directoryPath = "${appDocumentsDirectory!.path}/pets";
-    Directory(directoryPath).createSync(recursive: true);
+  Future<String> saveToLocalFile(
+      File? imageFile, Vermifugos? vermifugo, Vacinas? vacina) async {
+    Directory? appDocumentsDirectory = await getApplicationDocumentsDirectory();
+    if (titulo.contains("VERMÍFUGOS")) {
+      final directoryPath =
+          Directory("${appDocumentsDirectory.path}/vermifugos");
+      await directoryPath.create(recursive: true);
+      localImagePath =
+          "${appDocumentsDirectory.path}/vermifugos/${vermifugo!.id}.jpg";
+      if (imageFile != null) {
+        vermifugo.localImagem = localImagePath;
+      }
+    } else {
+      final directoryPath = Directory("${appDocumentsDirectory.path}/vacinas");
+      await directoryPath.create(recursive: true);
+      localImagePath =
+          "${appDocumentsDirectory.path}/vacinas/${vacina!.id}.jpg";
+      if (imageFile != null) {
+        vacina.localImagem = localImagePath;
+      }
+    }
 
-    localImagePath = "$directoryPath/$idPet.jpg";
-    await imageFile.copy(localImagePath);
+    try {
+      if (imageFile != null) {
+        await imageFile.copy(localImagePath);
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    if (titulo.contains("VERMÍFUGOS")) {
+      if (imagemSelecionada) {
+        vermifugo!.imagem = 'vermifugos/${vermifugo.id}.jpg';
+      } else {
+        vermifugo!.imagem = 'vermifugos/vermifugo.jpg';
+      }
+      vermifugosController.criarVermifugo(vermifugo);
+      vermifugosController.vermifugosPet.add(vermifugo);
+    } else {
+      if (imagemSelecionada) {
+        vacina!.imagem = 'vacinas/${vacina.id}.jpg';
+      } else {
+        vacina!.imagem = 'vacinas/vacina.jpg';
+      }
+      vacinasController.criarVacina(vacina);
+      vacinasController.vacinasPet.add(vacina);
+    }
 
     return localImagePath;
   }
@@ -106,12 +146,12 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
     return croppedImage;
   }
 
-  Future<UploadTask?> upload(String path, String idPet) async {
+  Future<UploadTask?> upload(String path, String id) async {
     File file = File(path);
     try {
       titulo.contains("VERMÍFUGOS")
-          ? ref = 'vermifugos/$idPet.jpg'
-          : ref = 'vacinas/$idPet.jpg';
+          ? ref = 'vermifugos/$id.jpg'
+          : ref = 'vacinas/$id.jpg';
       final storageRef = FirebaseStorage.instance.ref();
       storageRef.child(ref).delete();
       return storageRef.child(ref).putFile(
@@ -129,12 +169,16 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
     }
   }
 
-  pickAndUploadImage(String idPet) async {
+  pickAndUploadImage(Vermifugos? vermifugo, Vacinas? vacina) async {
     File? file = croppedImage;
     if (file != null) {
-      await saveToLocalFile(file, idPet);
-      await upload(file.path, idPet);
+      if (vermifugo != null) {
+        await upload(file.path, vermifugo.id!);
+      } else {
+        await upload(file.path, vacina!.id!);
+      }
     }
+    await saveToLocalFile(file, vermifugo, vacina);
   }
 
   @override
@@ -435,45 +479,37 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                             pet!.id!)
                                         .then((String id) {
                                       Vermifugos novoVermifugo;
-                                      pickAndUploadImage(id);
+
+                                      novoVermifugo = Vermifugos(
+                                        id: id,
+                                        nome: _nomeController.text,
+                                        peso:
+                                            double.parse(_pesoController.text),
+                                        dose:
+                                            double.parse(_doseController.text),
+                                        dataVacinacao: timeData,
+                                        proximaVacinacao: timeProxima,
+                                        imagem: 'vermifugos/$id.jpg',
+                                        pet: pet,
+                                        localImagem: localImagePath,
+                                      );
+                                      pickAndUploadImage(novoVermifugo, null);
                                       if (imagemSelecionada) {
                                         VermifugosApi.atualizarImagem(
                                             id, 'vermifugos/$id.jpg');
-                                        novoVermifugo = Vermifugos(
-                                          id: id,
-                                          nome: _nomeController.text,
-                                          peso: double.parse(
-                                              _pesoController.text),
-                                          dose: double.parse(
-                                              _doseController.text),
-                                          dataVacinacao: timeData,
-                                          proximaVacinacao: timeProxima,
-                                          imagem: 'vermifugos/$id.jpg',
-                                          pet: pet,
-                                          localImagem: localImagePath,
-                                        );
                                       } else {
                                         VermifugosApi.atualizarImagem(
                                             id, 'vermifugos/vermifugo.jpg');
-                                        novoVermifugo = Vermifugos(
-                                          id: id,
-                                          nome: _nomeController.text,
-                                          peso: double.parse(
-                                              _pesoController.text),
-                                          dose: double.parse(
-                                              _doseController.text),
-                                          dataVacinacao: timeData,
-                                          proximaVacinacao: timeProxima,
-                                          imagem: 'vermifugos/vermifugo.jpg',
-                                          pet: pet,
-                                          localImagem: localImagePath,
-                                        );
                                       }
-                                      vermifugosController
-                                          .criarVermifugo(novoVermifugo);
                                     });
-
                                     Get.back();
+                                    Get.offNamed(
+                                      "carteira",
+                                      arguments: {
+                                        'titulo': "VERMIFUGOS",
+                                        'pet': pet,
+                                      },
+                                    );
                                   } catch (e) {
                                     showTopSnackBar(
                                       Overlay.of(context),
@@ -507,45 +543,38 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                             timeProxima,
                                             pet!.id!)
                                         .then((String id) {
-                                      pickAndUploadImage(id);
                                       Vacinas novaVacina;
+                                      novaVacina = Vacinas(
+                                        id: id,
+                                        nome: _nomeController.text,
+                                        peso:
+                                            double.parse(_pesoController.text),
+                                        dose:
+                                            double.parse(_doseController.text),
+                                        dataVacinacao: timeData,
+                                        proximaVacinacao: timeProxima,
+                                        imagem: 'vacinas/vacina.jpg',
+                                        pet: pet,
+                                        localImagem: localImagePath,
+                                      );
+
+                                      pickAndUploadImage(null, novaVacina);
                                       if (imagemSelecionada) {
                                         VacinasApi.atualizarImagem(
                                             id, 'vacinas/$id.jpg');
-                                        novaVacina = Vacinas(
-                                          id: id,
-                                          nome: _nomeController.text,
-                                          peso: double.parse(
-                                              _pesoController.text),
-                                          dose: double.parse(
-                                              _doseController.text),
-                                          dataVacinacao: timeData,
-                                          proximaVacinacao: timeProxima,
-                                          imagem: 'vacinas/$id.jpg',
-                                          pet: pet,
-                                          localImagem: localImagePath,
-                                        );
                                       } else {
                                         VacinasApi.atualizarImagem(
                                             id, 'vacinas/vacina.jpg');
-
-                                        novaVacina = Vacinas(
-                                          id: id,
-                                          nome: _nomeController.text,
-                                          peso: double.parse(
-                                              _pesoController.text),
-                                          dose: double.parse(
-                                              _doseController.text),
-                                          dataVacinacao: timeData,
-                                          proximaVacinacao: timeProxima,
-                                          imagem: 'vacinas/vacina.jpg',
-                                          pet: pet,
-                                          localImagem: localImagePath,
-                                        );
                                       }
-                                      vacinasController.criarVacina(novaVacina);
                                     });
                                     Get.back();
+                                    Get.offNamed(
+                                      "carteira",
+                                      arguments: {
+                                        'titulo': "VACINAS",
+                                        'pet': pet,
+                                      },
+                                    );
                                   } catch (e) {
                                     showTopSnackBar(
                                       Overlay.of(context),

@@ -4,6 +4,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
+import 'package:pet_care/controllers/vacinas_controller.dart';
+import 'package:pet_care/controllers/vermifugos_controller.dart';
 import 'package:pet_care/models/pets.dart';
 import 'package:sizer/sizer.dart';
 
@@ -22,6 +24,8 @@ class CardPet extends StatefulWidget {
 
 class CardPetState extends State<CardPet> {
   late Reference storageRef;
+  final vacinasController = Get.put(VacinasController());
+  final vermifugosController = Get.put(VermifugosController());
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +55,8 @@ class CardPetState extends State<CardPet> {
                   ),
                 ),
                 onTap: () {
+                  vacinasController.obterVacinas(widget.pet!.id!);
+                  vermifugosController.obterVermifugo(widget.pet!.id!);
                   Get.toNamed("/info", arguments: {'pet': widget.pet});
                 },
               ),

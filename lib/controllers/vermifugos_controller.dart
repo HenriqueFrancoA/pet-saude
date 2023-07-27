@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 class VermifugosController extends GetxController {
   RxList vermifugos = RxList();
-  RxList vermifugosAux = RxList();
+  RxList vermifugosPet = RxList();
 
   final VermifugosDAO vermifugosDAO = VermifugosDAO();
   late Reference storageRef;
@@ -25,7 +25,8 @@ class VermifugosController extends GetxController {
 
       Directory? appDocumentsDirectory =
           await getApplicationDocumentsDirectory();
-      final directoryPath = Directory("${appDocumentsDirectory.path}/pets");
+      final directoryPath =
+          Directory("${appDocumentsDirectory.path}/vermifugos");
       await directoryPath.create(recursive: true);
 
       String localImagePath = "${directoryPath.path}/${vermifugo.id}.jpg";
@@ -44,15 +45,28 @@ class VermifugosController extends GetxController {
   }
 
   carregarVermifugos(String petId) async {
+    RxList vermifugosAux = RxList();
+
     vermifugosAux.addAll(await VermifugosApi.obterVermifugos(petId));
     for (Vermifugos vermifugo in vermifugosAux) {
       vermifugos.add(await baixarImage(vermifugo));
     }
-    vermifugosAux.clear();
   }
 
   criarVermifugo(Vermifugos vermifugo) async {
     await vermifugosDAO.insertVermifugo(vermifugo);
     vermifugos.add(vermifugo);
+  }
+
+  obterVermifugo(String petId) async {
+    vermifugosPet.clear();
+    for (Vermifugos vermifugo in vermifugos) {
+      if (vermifugo.pet!.id == petId) {
+        bool alreadyExists = vermifugosPet.any((v) => v.id == vermifugo.id);
+        if (!alreadyExists) {
+          vermifugosPet.add(vermifugo);
+        }
+      }
+    }
   }
 }

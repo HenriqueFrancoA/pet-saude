@@ -12,7 +12,6 @@ import 'package:http/http.dart' as http;
 
 class PetsController extends GetxController {
   RxList pets = RxList();
-  RxList petsAux = RxList();
 
   final PetsDAO petsDAO = PetsDAO();
   final vermifugosController = Get.put(VermifugosController());
@@ -36,7 +35,7 @@ class PetsController extends GetxController {
       await directoryPath.create(recursive: true);
 
       // Verificar se a imagem local já existe
-      String localImagePath = "${directoryPath.path}/${pet.id}.jpg";
+      String localImagePath = "${directoryPath.path}/${pet.id}.png";
       File localImageFile = File(localImagePath);
       bool exists = await localImageFile.exists();
 
@@ -59,6 +58,7 @@ class PetsController extends GetxController {
     pets.clear();
     vermifugosController.vermifugos.clear();
     vacinasController.vacinas.clear();
+    RxList petsAux = RxList();
     petsAux.addAll(await PetsApi.obterPets(tutorId));
     for (Pets pet in petsAux) {
       pets.add(await baixarImage(pet));
@@ -79,6 +79,6 @@ class PetsController extends GetxController {
 
   criarPet(Pets pet) async {
     await petsDAO.insertPet(pet);
-    pets.add(await baixarImage(pet));
+    pets.add(pet);
   }
 }

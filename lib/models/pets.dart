@@ -42,6 +42,7 @@ class Pets {
       'id': id,
       'nome': nome,
       'raca': raca,
+      'sexo': sexo,
       'nascimento':
           DateFormat('dd/MM/yyyy', 'pt_BR').format(nascimento!.toDate()),
       'peso': peso,
@@ -60,6 +61,7 @@ class Pets {
       id: map['id'],
       nome: map['nome'],
       raca: map['raca'],
+      sexo: map['sexo'],
       nascimento: timeNascimento,
       peso: map['peso'],
       imagem: map['imagem'],

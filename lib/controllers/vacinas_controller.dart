@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 class VacinasController extends GetxController {
   RxList vacinas = RxList();
-  RxList vacinasAux = RxList();
+  RxList vacinasPet = RxList();
 
   final VacinasDAO vacinasDAO = VacinasDAO();
   late Reference storageRef;
@@ -25,7 +25,7 @@ class VacinasController extends GetxController {
 
       Directory? appDocumentsDirectory =
           await getApplicationDocumentsDirectory();
-      final directoryPath = Directory("${appDocumentsDirectory.path}/pets");
+      final directoryPath = Directory("${appDocumentsDirectory.path}/vacinas");
       await directoryPath.create(recursive: true);
 
       String localImagePath = "${directoryPath.path}/${vacina.id}.jpg";
@@ -44,17 +44,28 @@ class VacinasController extends GetxController {
   }
 
   carregarVacinas(String petId) async {
+    RxList vacinasAux = RxList();
+
     vacinasAux.addAll(await VacinasApi.obterVacinas(petId));
     for (Vacinas vacina in vacinasAux) {
       vacinas.add(await baixarImage(vacina));
     }
-    vacinasAux.clear();
   }
 
   criarVacina(Vacinas vacina) async {
-    try {
-      vacinasDAO.insertVacina(vacina);
-      vacinas.add(vacina);
-    } catch (e) {}
+    await vacinasDAO.insertVacina(vacina);
+    vacinas.add(vacina);
+  }
+
+  obterVacinas(String petId) async {
+    vacinasPet.clear();
+    for (Vacinas vacina in vacinas) {
+      if (vacina.pet!.id == petId) {
+        bool alreadyExists = vacinasPet.any((v) => v.id == vacina.id);
+        if (!alreadyExists) {
+          vacinasPet.add(vacina);
+        }
+      }
+    }
   }
 }
