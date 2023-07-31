@@ -10,6 +10,7 @@ import 'package:pet_care/models/vacinas.dart';
 import 'package:pet_care/models/vermifugos.dart';
 import 'package:pet_care/screens/carteirinha/carteirinha_card.dart';
 import 'package:sizer/sizer.dart';
+import 'package:connectivity/connectivity.dart';
 
 class CarteirinhaScreen extends StatefulWidget {
   const CarteirinhaScreen({
@@ -46,6 +47,11 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
 
     myBanner.load();
     super.initState();
+  }
+
+  Future<bool> hasInternet() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
   }
 
   @override
@@ -149,16 +155,29 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
             ],
           ),
         ),
-        bottomSheet: anuncio.isTrue
-            ? Container(
+        bottomSheet: FutureBuilder<bool>(
+          future: hasInternet(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                height: 0,
+              );
+            } else if (snapshot.data == true) {
+              return Container(
                 width: queryData.size.width,
                 height: 50,
                 color: Colors.black,
                 child: AdWidget(
                   ad: myBanner,
                 ),
-              )
-            : null,
+              );
+            } else {
+              return Container(
+                height: 0,
+              );
+            }
+          },
+        ),
       ),
     );
   }

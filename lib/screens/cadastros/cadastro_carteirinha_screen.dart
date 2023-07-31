@@ -18,6 +18,7 @@ import 'package:pet_care/components/input_component.dart';
 import 'package:pet_care/controllers/login_controller.dart';
 import 'package:pet_care/controllers/vacinas_controller.dart';
 import 'package:pet_care/controllers/vermifugos_controller.dart';
+import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/models/pets.dart';
 import 'package:pet_care/models/vacinas.dart';
 import 'package:pet_care/models/vermifugos.dart';
@@ -50,6 +51,7 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
   final loginController = Get.put(LoginController());
   final vacinasController = Get.put(VacinasController());
   final vermifugosController = Get.put(VermifugosController());
+  final versaoController = Get.put(VersaoController());
 
   String ref = '';
   XFile? image;
@@ -502,6 +504,7 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                             id, 'vermifugos/vermifugo.jpg');
                                       }
                                     });
+                                    versaoController.atualizarVersao();
                                     Get.back();
                                     Get.offNamed(
                                       "carteira",
@@ -567,6 +570,7 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                             id, 'vacinas/vacina.jpg');
                                       }
                                     });
+                                    versaoController.atualizarVersao();
                                     Get.back();
                                     Get.offNamed(
                                       "carteira",

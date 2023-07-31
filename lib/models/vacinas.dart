@@ -60,6 +60,8 @@ class Vacinas {
     final timeVacinacao = Timestamp.fromDate(date);
     date = dateFormat.parse(map['proxima_vacinacao']);
     final timeProxima = Timestamp.fromDate(date);
+    date = dateFormat.parse(map['nascimento']);
+    final nascimento = Timestamp.fromDate(date);
     return Vacinas(
       id: map['id'],
       nome: map['nome'],
@@ -73,7 +75,7 @@ class Vacinas {
         nome: map['nome:1'],
         raca: map['raca'],
         sexo: map['sexo'],
-        nascimento: map['nascimento'],
+        nascimento: nascimento,
         peso: map['peso:1'],
         imagem: map['imagem:1'],
         tutor: map['tutor'],

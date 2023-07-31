@@ -16,6 +16,7 @@ import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/components/input_component.dart';
 import 'package:pet_care/controllers/login_controller.dart';
 import 'package:pet_care/controllers/pets_controller.dart';
+import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/models/pets.dart';
 import 'package:sizer/sizer.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -52,6 +53,7 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
 
   final loginController = Get.put(LoginController());
   final petsController = Get.put(PetsController());
+  final versaoController = Get.put(VersaoController());
 
   String ref = '';
   XFile? image;
@@ -77,27 +79,29 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
     }
   }
 
-  Future<String> saveToLocalFile(File? imageFile, Pets pet) async {
+  Future<String> saveToLocalFile(File? imageFile, Pets novopet) async {
     Directory? appDocumentsDirectory = await getApplicationDocumentsDirectory();
     final directoryPath = Directory("${appDocumentsDirectory.path}/pets");
     await directoryPath.create(recursive: true);
 
-    localImagePath = "${appDocumentsDirectory.path}/pets/${pet.id}.png";
+    localImagePath = "${appDocumentsDirectory.path}/pets/${novopet.id}.png";
 
     try {
       if (imageFile != null) {
         await imageFile.copy(localImagePath);
-        pet.localImagem = localImagePath;
+        novopet.localImagem = localImagePath;
       }
     } catch (e) {
       print(e);
     }
     if (imagemSelecionada) {
-      pet.imagem = 'pets/${pet.id}.png';
+      novopet.imagem = 'pets/${novopet.id}.png';
     } else {
-      pet.imagem = 'pets/pet.png';
+      novopet.imagem = 'pets/pet.png';
     }
-    petsController.criarPet(pet);
+    if (pet == null) {
+      petsController.criarPet(novopet);
+    }
 
     return localImagePath;
   }
@@ -497,6 +501,7 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                                               localImagem: pet!.localImagem,
                                             );
                                           }
+                                          versaoController.atualizarVersao();
 
                                           petsController
                                               .atualizarPet(petAtualizado);
@@ -583,6 +588,7 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                                                   id, 'pets/pet.png');
                                             }
                                           });
+                                          versaoController.atualizarVersao();
 
                                           Get.offNamed('/home');
                                         } catch (e) {

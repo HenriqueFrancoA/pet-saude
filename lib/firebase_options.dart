@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCvDhc4XoMfFOhgzprP9pQGLtpHz8mOmew',
-    appId: '1:541319243298:android:bd189e3516ef4d7f8b8c7b',
+    appId: '1:541319243298:android:7a712bc4a349ffa58b8c7b',
     messagingSenderId: '541319243298',
     projectId: 'pet-care-85209',
     storageBucket: 'pet-care-85209.appspot.com',
@@ -59,12 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBxtBnZpHoVQXRwP4d0WHUG9yeA5f-PMcU',
-    appId: '1:541319243298:ios:3046d054b28c5b148b8c7b',
+    appId: '1:541319243298:ios:3d045535aaa361e98b8c7b',
     messagingSenderId: '541319243298',
     projectId: 'pet-care-85209',
     storageBucket: 'pet-care-85209.appspot.com',
-    androidClientId: '541319243298-okc31usl5jchgpek36ps9p9dpnsiurba.apps.googleusercontent.com',
-    iosClientId: '541319243298-redu97iseoumc8f3ggnalk7cb45rr9r7.apps.googleusercontent.com',
-    iosBundleId: 'com.example.petCare',
+    androidClientId: '541319243298-bs20pce5jrk6jsutkk93h7ev76b3o1mr.apps.googleusercontent.com',
+    iosClientId: '541319243298-gv9179lj3pllrsrmsi0ua3m57p6p6r01.apps.googleusercontent.com',
+    iosBundleId: 'com.henrique.petCare',
   );
 }

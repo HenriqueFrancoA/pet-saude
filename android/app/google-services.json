@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "541319243298-bs20pce5jrk6jsutkk93h7ev76b3o1mr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pet_care",
+            "certificate_hash": "000e9df0e0fbe9236aad1cafb6464e8abc6c3e6e"
+          }
+        },
+        {
           "client_id": "541319243298-okc31usl5jchgpek36ps9p9dpnsiurba.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -39,10 +47,62 @@
               "client_type": 3
             },
             {
-              "client_id": "541319243298-redu97iseoumc8f3ggnalk7cb45rr9r7.apps.googleusercontent.com",
+              "client_id": "541319243298-gv9179lj3pllrsrmsi0ua3m57p6p6r01.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.petCare"
+                "bundle_id": "com.henrique.petCare"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:541319243298:android:7a712bc4a349ffa58b8c7b",
+        "android_client_info": {
+          "package_name": "com.henrique.pet_care"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "541319243298-93cbbg0nm22mtaid0gvmp4a7p3j9vdi7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.henrique.pet_care",
+            "certificate_hash": "8d17183382238bcdfce7e018b1bdac3783dc5c5d"
+          }
+        },
+        {
+          "client_id": "541319243298-k4jha0cqgpmvu8p7gvirehdv541u1vnf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.henrique.pet_care",
+            "certificate_hash": "000e9df0e0fbe9236aad1cafb6464e8abc6c3e6e"
+          }
+        },
+        {
+          "client_id": "541319243298-tf6nst59epcmnnee94mmcf9mlj1tvts2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvDhc4XoMfFOhgzprP9pQGLtpHz8mOmew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "541319243298-ig24n4ctb4b274eh984hg92hm3attruk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "541319243298-gv9179lj3pllrsrmsi0ua3m57p6p6r01.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.henrique.petCare"
               }
             }
           ]

@@ -59,13 +59,6 @@ class VacinasController extends GetxController {
 
   obterVacinas(String petId) async {
     vacinasPet.clear();
-    for (Vacinas vacina in vacinas) {
-      if (vacina.pet!.id == petId) {
-        bool alreadyExists = vacinasPet.any((v) => v.id == vacina.id);
-        if (!alreadyExists) {
-          vacinasPet.add(vacina);
-        }
-      }
-    }
+    vacinasPet.addAll(await vacinasDAO.getVacinasByPetId(petId));
   }
 }

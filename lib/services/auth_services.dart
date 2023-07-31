@@ -17,6 +17,10 @@ class AuthService {
       prefs.setBool('salvarAcesso', true);
     });
 
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('versao', 0);
+    });
+
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 

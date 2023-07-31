@@ -5,65 +5,83 @@ import 'package:get/get.dart';
 import 'package:pet_care/apis/pets_api.dart';
 import 'package:pet_care/controllers/vacinas_controller.dart';
 import 'package:pet_care/controllers/vermifugos_controller.dart';
+import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/models/pets.dart';
 import 'package:pet_care/utils/petsDAO.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:pet_care/utils/vacinasDAO.dart';
+import 'package:pet_care/utils/vermifugosDAO.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PetsController extends GetxController {
   RxList pets = RxList();
 
   final PetsDAO petsDAO = PetsDAO();
+  final VermifugosDAO vermifugosDAO = VermifugosDAO();
+  final VacinasDAO vacinasDAO = VacinasDAO();
+
+  final versaoController = Get.put(VersaoController());
   final vermifugosController = Get.put(VermifugosController());
   final vacinasController = Get.put(VacinasController());
   late Reference storageRef;
 
   Future<Pets> baixarImage(Pets pet) async {
     if (!pet.imagem!.contains("pet.png")) {
-      // Pegar o caminho (referência) da imagem no Firebase Storage
       String ref = pet.imagem!;
       Reference storageRef = FirebaseStorage.instance.ref().child(ref);
 
-      // Fazer o download da imagem a partir do URL
       String downloadURL = await storageRef.getDownloadURL();
       http.Response response = await http.get(Uri.parse(downloadURL));
 
-      // Obter o diretório de armazenamento externo do aplicativo
       Directory? appDocumentsDirectory =
           await getApplicationDocumentsDirectory();
       final directoryPath = Directory("${appDocumentsDirectory.path}/pets");
       await directoryPath.create(recursive: true);
 
-      // Verificar se a imagem local já existe
       String localImagePath = "${directoryPath.path}/${pet.id}.png";
       File localImageFile = File(localImagePath);
       bool exists = await localImageFile.exists();
 
-      // Salvar a imagem no armazenamento local apenas se ela ainda não existir
       if (!exists) {
         await localImageFile.writeAsBytes(response.bodyBytes);
       }
 
-      // Atualizar o atributo localImagem do objeto Pets com o caminho da imagem local
       pet.localImagem = localImagePath;
     }
 
-    // Inserir ou atualizar o registro do pet no banco de dados local
     await petsDAO.insertPet(pet);
 
     return pet;
   }
 
   carregarPets(String tutorId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int versaoAtual = prefs.getInt("versao") ?? 0;
     pets.clear();
     vermifugosController.vermifugos.clear();
     vacinasController.vacinas.clear();
     RxList petsAux = RxList();
-    petsAux.addAll(await PetsApi.obterPets(tutorId));
-    for (Pets pet in petsAux) {
-      pets.add(await baixarImage(pet));
-      vermifugosController.carregarVermifugos(pet.id!);
-      vacinasController.carregarVacinas(pet.id!);
+    if (versaoAtual != versaoController.versao!.versao) {
+      petsAux.addAll(await PetsApi.obterPets(tutorId));
+      for (Pets pet in petsAux) {
+        pets.add(await baixarImage(pet));
+        vermifugosController.carregarVermifugos(pet.id!);
+        vacinasController.carregarVacinas(pet.id!);
+      }
+      await SharedPreferences.getInstance().then((prefs) {
+        prefs.setInt('versao', versaoController.versao!.versao!);
+      });
+      versaoAtual = versaoController.versao!.versao!;
+    } else {
+      petsAux.addAll(await petsDAO.getPetsByTutor(tutorId));
+      for (Pets pet in petsAux) {
+        pets.add(pet);
+        vermifugosController.vermifugos
+            .addAll(await vermifugosDAO.getVermifugosByPetId(pet.id!));
+        vacinasController.vacinas
+            .addAll(await vacinasDAO.getVacinasByPetId(pet.id!));
+      }
     }
     petsAux.clear();
   }

@@ -26,7 +26,8 @@ class VermifugosDAO {
   Future<List<Vermifugos>> getVermifugosByPetId(String petId) async {
     final db = await DatabaseHelper().database;
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-      'SELECT * FROM tb_vermifugos v INNER JOIN tb_pets p ON v.pet_id = p.id WHERE v.pet_id = $petId',
+      'SELECT * FROM tb_vermifugos v INNER JOIN tb_pets p ON v.pet_id = p.id WHERE v.pet_id = ?',
+      [petId],
     );
     return List.generate(
         maps.length, (index) => Vermifugos.fromMap(maps[index]));

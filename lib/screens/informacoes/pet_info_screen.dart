@@ -9,6 +9,7 @@ import 'package:lottie/lottie.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/models/pets.dart';
 import 'package:sizer/sizer.dart';
+import 'package:connectivity/connectivity.dart';
 
 class PetInfoScreen extends StatefulWidget {
   const PetInfoScreen({
@@ -42,6 +43,11 @@ class PetInfoScreenState extends State<PetInfoScreen> {
 
     myBanner.load();
     super.initState();
+  }
+
+  Future<bool> hasInternet() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
   }
 
   @override
@@ -302,16 +308,29 @@ class PetInfoScreenState extends State<PetInfoScreen> {
             ],
           ),
         ),
-        bottomSheet: anuncio.isTrue
-            ? Container(
+        bottomSheet: FutureBuilder<bool>(
+          future: hasInternet(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                height: 0,
+              );
+            } else if (snapshot.data == true) {
+              return Container(
                 width: queryData.size.width,
                 height: 50,
                 color: Colors.black,
                 child: AdWidget(
                   ad: myBanner,
                 ),
-              )
-            : null,
+              );
+            } else {
+              return Container(
+                height: 0,
+              );
+            }
+          },
+        ),
       ),
     );
   }
