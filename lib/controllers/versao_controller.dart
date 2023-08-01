@@ -21,4 +21,10 @@ class VersaoController extends GetxController {
       prefs.setInt('versao', versao!.versao!);
     });
   }
+
+  Future<void> deletarVersao() async {
+    await VersaoApi.deletarVersao(versao!.id!);
+
+    versao = null;
+  }
 }

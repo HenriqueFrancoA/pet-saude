@@ -91,4 +91,10 @@ abstract class PetsApi {
 
     return listPets;
   }
+
+  static Future<dynamic> deletarPet(String id) async {
+    var db = FirebaseFirestore.instance;
+    DocumentReference documentRef = db.collection("PETS").doc(id);
+    await documentRef.delete();
+  }
 }

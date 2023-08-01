@@ -3,7 +3,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  signInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
     final GoogleSignInAuthentication gAuth = await gUser!.authentication;
@@ -21,7 +21,7 @@ class AuthService {
       prefs.setInt('versao', 0);
     });
 
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+    await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   Future<bool> isLogged() async {
@@ -33,5 +33,35 @@ class AuthService {
       return true;
     }
     return false;
+  }
+
+  Future<void> signOut() async {
+    await GoogleSignIn().signOut();
+
+    await FirebaseAuth.instance.signOut();
+
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.remove('salvarAcesso');
+      prefs.remove('versao');
+    });
+  }
+
+  Future<void> deleteAccount() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await user.delete();
+
+        final prefs = await SharedPreferences.getInstance();
+        prefs.remove('salvarAcesso');
+        prefs.remove('versao');
+
+        await GoogleSignIn().signOut();
+
+        await FirebaseAuth.instance.signOut();
+      } catch (e) {
+        print("Erro ao deletar a conta: $e");
+      }
+    }
   }
 }

@@ -3,11 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pet_care/controllers/login_controller.dart';
-import 'package:pet_care/controllers/pets_controller.dart';
-import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/screens/cadastros/cadastro_carteirinha_screen.dart';
 import 'package:pet_care/screens/cadastros/cadastro_pet_screen.dart';
 import 'package:pet_care/screens/carteirinha/carteirinha_screen.dart';
+import 'package:pet_care/screens/config/config_screen.dart';
 import 'package:pet_care/screens/informacoes/pet_info_screen.dart';
 import 'package:pet_care/screens/loading/loading_screen.dart';
 import 'package:pet_care/screens/login/login_screen.dart';
@@ -67,6 +66,10 @@ class Main extends StatelessWidget {
               name: '/loading',
               page: () => const LoadingScreen(),
             ),
+            GetPage(
+              name: '/config',
+              page: () => const ConfigScreen(),
+            ),
           ],
         );
       },
@@ -79,14 +82,12 @@ void handleAuthStateChanges(User? firebaseUser) {
     Future.delayed(Duration.zero, () async {
       final loginController = Get.put(LoginController());
       loginController.uID.value = firebaseUser.uid;
-      final versaoController = Get.put(VersaoController());
-      await versaoController.obterVersao(firebaseUser.uid);
-      final petsController = Get.put(PetsController());
-      await petsController.carregarPets(loginController.uID.value);
-      Get.offAllNamed('/home');
+      Get.offAllNamed("/loading", arguments: {'delete': false, 'sair': false});
     });
   } else {
-    Get.offAllNamed('/login');
+    Get.offAllNamed(
+      '/login',
+    );
   }
 }
 

@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 class VacinasController extends GetxController {
   RxList vacinas = RxList();
   RxList vacinasPet = RxList();
+  RxBool isLoading = false.obs;
 
   final VacinasDAO vacinasDAO = VacinasDAO();
   late Reference storageRef;
@@ -44,12 +45,14 @@ class VacinasController extends GetxController {
   }
 
   carregarVacinas(String petId) async {
+    isLoading.value = true;
     RxList vacinasAux = RxList();
 
     vacinasAux.addAll(await VacinasApi.obterVacinas(petId));
     for (Vacinas vacina in vacinasAux) {
       vacinas.add(await baixarImage(vacina));
     }
+    isLoading.value = false;
   }
 
   criarVacina(Vacinas vacina) async {
@@ -60,5 +63,24 @@ class VacinasController extends GetxController {
   obterVacinas(String petId) async {
     vacinasPet.clear();
     vacinasPet.addAll(await vacinasDAO.getVacinasByPetId(petId));
+  }
+
+  Future<void> deletarVacinas() async {
+    isLoading.value = true;
+    for (Vacinas vacina in vacinas) {
+      if (vacina.imagem != null && !vacina.imagem!.contains("vacina.jpg")) {
+        final storageRef = FirebaseStorage.instance.ref().child(vacina.imagem!);
+        await storageRef.delete();
+      }
+      await VacinasApi.deletarVacina(vacina.id!);
+      await vacinasDAO.deleteVacina(vacina.id!);
+      if (vacina.localImagem != null &&
+          File(vacina.localImagem!).existsSync()) {
+        File(vacina.localImagem!).deleteSync();
+      }
+    }
+
+    vacinas.clear();
+    isLoading.value = false;
   }
 }

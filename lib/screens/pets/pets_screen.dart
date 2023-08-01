@@ -74,9 +74,22 @@ class PetsScreenState extends State<PetsScreen> {
               SizedBox(
                 width: queryData.size.width,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        onPressed: () {
+                          Get.toNamed("/config");
+                        },
+                        icon: const Icon(
+                          Ionicons.cog,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                      ),
+                    ),
                     Text(
                       "QUEM É O BOM GAROTO(A)?",
                       style: GoogleFonts.poppins(
@@ -141,7 +154,7 @@ class PetsScreenState extends State<PetsScreen> {
                       ],
                     ),
                     SizedBox(
-                      height: 1.h,
+                      height: 2.h,
                     ),
                   ],
                 ),

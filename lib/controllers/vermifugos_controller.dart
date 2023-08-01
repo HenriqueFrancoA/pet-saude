@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 class VermifugosController extends GetxController {
   RxList vermifugos = RxList();
   RxList vermifugosPet = RxList();
+  RxBool isLoading = false.obs;
 
   final VermifugosDAO vermifugosDAO = VermifugosDAO();
   late Reference storageRef;
@@ -45,12 +46,14 @@ class VermifugosController extends GetxController {
   }
 
   carregarVermifugos(String petId) async {
+    isLoading.value = true;
     RxList vermifugosAux = RxList();
 
     vermifugosAux.addAll(await VermifugosApi.obterVermifugos(petId));
     for (Vermifugos vermifugo in vermifugosAux) {
       vermifugos.add(await baixarImage(vermifugo));
     }
+    isLoading.value = false;
   }
 
   criarVermifugo(Vermifugos vermifugo) async {
@@ -68,5 +71,25 @@ class VermifugosController extends GetxController {
         }
       }
     }
+  }
+
+  Future<void> deletarVermifugos() async {
+    isLoading.value = true;
+    for (Vermifugos vermifugo in vermifugos) {
+      if (vermifugo.imagem != null &&
+          !vermifugo.imagem!.contains("vermifugo.jpg")) {
+        final storageRef =
+            FirebaseStorage.instance.ref().child(vermifugo.imagem!);
+        await storageRef.delete();
+      }
+      await VermifugosApi.deletarVermifugo(vermifugo.id!);
+      await vermifugosDAO.deleteVermifugo(vermifugo.id!);
+      if (vermifugo.localImagem != null &&
+          File(vermifugo.localImagem!).existsSync()) {
+        File(vermifugo.localImagem!).deleteSync();
+      }
+    }
+    vermifugos.clear();
+    isLoading.value = false;
   }
 }

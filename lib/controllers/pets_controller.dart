@@ -16,6 +16,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PetsController extends GetxController {
   RxList pets = RxList();
+  RxList petsAux = RxList();
+  RxBool isLoading = false.obs;
 
   final PetsDAO petsDAO = PetsDAO();
   final VermifugosDAO vermifugosDAO = VermifugosDAO();
@@ -56,12 +58,12 @@ class PetsController extends GetxController {
   }
 
   carregarPets(String tutorId) async {
+    isLoading.value = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int versaoAtual = prefs.getInt("versao") ?? 0;
     pets.clear();
     vermifugosController.vermifugos.clear();
     vacinasController.vacinas.clear();
-    RxList petsAux = RxList();
     if (versaoAtual != versaoController.versao!.versao) {
       petsAux.addAll(await PetsApi.obterPets(tutorId));
       for (Pets pet in petsAux) {
@@ -84,6 +86,7 @@ class PetsController extends GetxController {
       }
     }
     petsAux.clear();
+    isLoading.value = false;
   }
 
   atualizarPet(Pets pet) async {
@@ -98,5 +101,22 @@ class PetsController extends GetxController {
   criarPet(Pets pet) async {
     await petsDAO.insertPet(pet);
     pets.add(pet);
+  }
+
+  Future<void> deletarPets() async {
+    isLoading.value = true;
+    for (Pets pet in pets) {
+      if (pet.imagem != null && !pet.imagem!.contains("pet.png")) {
+        final storageRef = FirebaseStorage.instance.ref().child(pet.imagem!);
+        await storageRef.delete();
+      }
+      await PetsApi.deletarPet(pet.id!);
+      await petsDAO.deletePet(pet.id!);
+      if (pet.localImagem != null && File(pet.localImagem!).existsSync()) {
+        File(pet.localImagem!).deleteSync();
+      }
+    }
+    pets.clear();
+    isLoading.value = false;
   }
 }

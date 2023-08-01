@@ -92,4 +92,10 @@ abstract class VermifugosApi {
       return listPets;
     }
   }
+
+  static Future<dynamic> deletarVermifugo(String id) async {
+    var db = FirebaseFirestore.instance;
+    DocumentReference documentRef = db.collection("VERMIFUGOS").doc(id);
+    await documentRef.delete();
+  }
 }

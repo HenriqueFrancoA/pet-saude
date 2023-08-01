@@ -92,4 +92,10 @@ abstract class VacinasApi {
       return listPets;
     }
   }
+
+  static Future<dynamic> deletarVacina(String id) async {
+    var db = FirebaseFirestore.instance;
+    DocumentReference documentRef = db.collection("VACINAS").doc(id);
+    await documentRef.delete();
+  }
 }

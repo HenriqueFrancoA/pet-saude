@@ -68,4 +68,10 @@ abstract class VersaoApi {
 
     return versao;
   }
+
+  static Future<dynamic> deletarVersao(String id) async {
+    var db = FirebaseFirestore.instance;
+    DocumentReference documentRef = db.collection("VERSAO").doc(id);
+    await documentRef.delete();
+  }
 }
