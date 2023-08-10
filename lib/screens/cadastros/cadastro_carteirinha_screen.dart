@@ -10,8 +10,6 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:pet_care/apis/vacinas_api.dart';
-import 'package:pet_care/apis/vermifugos_api.dart';
 import 'package:pet_care/components/button_components.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/components/input_component.dart';
@@ -23,7 +21,6 @@ import 'package:pet_care/models/pets.dart';
 import 'package:pet_care/models/vacinas.dart';
 import 'package:pet_care/models/vermifugos.dart';
 import 'package:sizer/sizer.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -40,7 +37,6 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
   final titulo = Get.arguments['titulo'] as String;
 
   late Reference storageRef;
-  String localImagePath = '';
 
   final _nomeController = TextEditingController();
   final _dataController = TextEditingController();
@@ -75,57 +71,6 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
     }
   }
 
-  Future<String> saveToLocalFile(
-      File? imageFile, Vermifugos? vermifugo, Vacinas? vacina) async {
-    Directory? appDocumentsDirectory = await getApplicationDocumentsDirectory();
-    if (titulo.contains("VERMÍFUGOS")) {
-      final directoryPath =
-          Directory("${appDocumentsDirectory.path}/vermifugos");
-      await directoryPath.create(recursive: true);
-      localImagePath =
-          "${appDocumentsDirectory.path}/vermifugos/${vermifugo!.id}.jpg";
-      if (imageFile != null) {
-        vermifugo.localImagem = localImagePath;
-      }
-    } else {
-      final directoryPath = Directory("${appDocumentsDirectory.path}/vacinas");
-      await directoryPath.create(recursive: true);
-      localImagePath =
-          "${appDocumentsDirectory.path}/vacinas/${vacina!.id}.jpg";
-      if (imageFile != null) {
-        vacina.localImagem = localImagePath;
-      }
-    }
-
-    try {
-      if (imageFile != null) {
-        await imageFile.copy(localImagePath);
-      }
-    } catch (e) {
-      print(e);
-    }
-
-    if (titulo.contains("VERMÍFUGOS")) {
-      if (imagemSelecionada) {
-        vermifugo!.imagem = 'vermifugos/${vermifugo.id}.jpg';
-      } else {
-        vermifugo!.imagem = 'vermifugos/vermifugo.jpg';
-      }
-      vermifugosController.criarVermifugo(vermifugo);
-      vermifugosController.vermifugosPet.add(vermifugo);
-    } else {
-      if (imagemSelecionada) {
-        vacina!.imagem = 'vacinas/${vacina.id}.jpg';
-      } else {
-        vacina!.imagem = 'vacinas/vacina.jpg';
-      }
-      vacinasController.criarVacina(vacina);
-      vacinasController.vacinasPet.add(vacina);
-    }
-
-    return localImagePath;
-  }
-
   Future<File?> cropImage(XFile imagePath) async {
     final imageCropper = ImageCropper();
     croppedImage = await imageCropper.cropImage(
@@ -146,41 +91,6 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
       ),
     );
     return croppedImage;
-  }
-
-  Future<UploadTask?> upload(String path, String id) async {
-    File file = File(path);
-    try {
-      titulo.contains("VERMÍFUGOS")
-          ? ref = 'vermifugos/$id.jpg'
-          : ref = 'vacinas/$id.jpg';
-      final storageRef = FirebaseStorage.instance.ref();
-      storageRef.child(ref).delete();
-      return storageRef.child(ref).putFile(
-            file,
-            SettableMetadata(
-              cacheControl: "public, max-age=600",
-              contentType: "image/jpg",
-              customMetadata: {
-                "user": "123",
-              },
-            ),
-          );
-    } on FirebaseException catch (e) {
-      throw Exception('Erro no upload: ${e.code}');
-    }
-  }
-
-  pickAndUploadImage(Vermifugos? vermifugo, Vacinas? vacina) async {
-    File? file = croppedImage;
-    if (file != null) {
-      if (vermifugo != null) {
-        await upload(file.path, vermifugo.id!);
-      } else {
-        await upload(file.path, vacina!.id!);
-      }
-    }
-    await saveToLocalFile(file, vermifugo, vacina);
   }
 
   @override
@@ -472,39 +382,22 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                         .parse(_proximaDataController.text);
                                     final timeProxima =
                                         Timestamp.fromDate(date);
-                                    VermifugosApi.criarVermifugo(
-                                            _nomeController.text,
-                                            double.parse(_pesoController.text),
-                                            double.parse(_doseController.text),
-                                            timeData,
-                                            timeProxima,
-                                            pet!.id!)
-                                        .then((String id) {
-                                      Vermifugos novoVermifugo;
+                                    Vermifugos novoVermifugo;
+                                    novoVermifugo = Vermifugos(
+                                      nome: _nomeController.text,
+                                      peso: double.parse(_pesoController.text),
+                                      dose: double.parse(_doseController.text),
+                                      dataVacinacao: timeData,
+                                      proximaVacinacao: timeProxima,
+                                      pet: pet,
+                                      localPet: pet,
+                                    );
 
-                                      novoVermifugo = Vermifugos(
-                                        id: id,
-                                        nome: _nomeController.text,
-                                        peso:
-                                            double.parse(_pesoController.text),
-                                        dose:
-                                            double.parse(_doseController.text),
-                                        dataVacinacao: timeData,
-                                        proximaVacinacao: timeProxima,
-                                        imagem: 'vermifugos/$id.jpg',
-                                        pet: pet,
-                                        localImagem: localImagePath,
-                                      );
-                                      pickAndUploadImage(novoVermifugo, null);
-                                      if (imagemSelecionada) {
-                                        VermifugosApi.atualizarImagem(
-                                            id, 'vermifugos/$id.jpg');
-                                      } else {
-                                        VermifugosApi.atualizarImagem(
-                                            id, 'vermifugos/vermifugo.jpg');
-                                      }
-                                    });
-                                    versaoController.atualizarVersao();
+                                    vermifugosController.criarVermifugo(
+                                        novoVermifugo,
+                                        croppedImage,
+                                        imagemSelecionada);
+
                                     Get.back();
                                     Get.offNamed(
                                       "carteira",
@@ -538,39 +431,20 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                         .parse(_proximaDataController.text);
                                     final timeProxima =
                                         Timestamp.fromDate(date);
-                                    VacinasApi.criarVacina(
-                                            _nomeController.text,
-                                            double.parse(_pesoController.text),
-                                            double.parse(_doseController.text),
-                                            timeData,
-                                            timeProxima,
-                                            pet!.id!)
-                                        .then((String id) {
-                                      Vacinas novaVacina;
-                                      novaVacina = Vacinas(
-                                        id: id,
-                                        nome: _nomeController.text,
-                                        peso:
-                                            double.parse(_pesoController.text),
-                                        dose:
-                                            double.parse(_doseController.text),
-                                        dataVacinacao: timeData,
-                                        proximaVacinacao: timeProxima,
-                                        imagem: 'vacinas/vacina.jpg',
-                                        pet: pet,
-                                        localImagem: localImagePath,
-                                      );
+                                    //  FirebaseApi().scheduleNotification(date);
+                                    Vacinas novaVacina;
+                                    novaVacina = Vacinas(
+                                      nome: _nomeController.text,
+                                      peso: double.parse(_pesoController.text),
+                                      dose: double.parse(_doseController.text),
+                                      dataVacinacao: timeData,
+                                      proximaVacinacao: timeProxima,
+                                      pet: pet,
+                                      localPet: pet,
+                                    );
+                                    vacinasController.criarVacina(novaVacina,
+                                        croppedImage, imagemSelecionada);
 
-                                      pickAndUploadImage(null, novaVacina);
-                                      if (imagemSelecionada) {
-                                        VacinasApi.atualizarImagem(
-                                            id, 'vacinas/$id.jpg');
-                                      } else {
-                                        VacinasApi.atualizarImagem(
-                                            id, 'vacinas/vacina.jpg');
-                                      }
-                                    });
-                                    versaoController.atualizarVersao();
                                     Get.back();
                                     Get.offNamed(
                                       "carteira",

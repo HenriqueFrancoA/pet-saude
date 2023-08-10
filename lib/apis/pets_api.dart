@@ -4,24 +4,19 @@ import 'package:pet_care/models/pets.dart';
 
 abstract class PetsApi {
   static Future<String> criarPet(
-    String nome,
-    String raca,
-    String sexo,
-    Timestamp nascimento,
-    double peso,
-    String tutor,
+    Pets pet,
   ) async {
     var db = FirebaseFirestore.instance;
-    PetsDTO pet = PetsDTO(
-      nome: nome,
-      raca: raca,
-      sexo: sexo,
-      nascimento: nascimento,
-      peso: peso,
-      tutor: tutor,
+    PetsDTO novoPet = PetsDTO(
+      nome: pet.nome,
+      raca: pet.raca,
+      sexo: pet.sexo,
+      nascimento: pet.nascimento,
+      peso: pet.peso,
+      tutor: pet.tutor,
     );
     try {
-      DocumentReference doc = await db.collection("PETS").add(pet.toJson());
+      DocumentReference doc = await db.collection("PETS").add(novoPet.toJson());
       return doc.id;
     } catch (e) {
       return '';
@@ -43,24 +38,16 @@ abstract class PetsApi {
     });
   }
 
-  static Future<dynamic> atualizarPet(
-    String id,
-    String nome,
-    String raca,
-    String sexo,
-    Timestamp nascimento,
-    double peso,
-    String imagem,
-  ) async {
+  static Future<dynamic> atualizarPet(Pets pet) async {
     var db = FirebaseFirestore.instance;
-    DocumentReference documentRef = db.collection("PETS").doc(id);
+    DocumentReference documentRef = db.collection("PETS").doc(pet.id);
     documentRef.update({
-      "NOME": nome,
-      "RACA": raca,
-      "SEXO": sexo,
-      "NASCIMENTO": nascimento,
-      "PESO": peso,
-      "IMAGEM": imagem,
+      "NOME": pet.nome,
+      "RACA": pet.raca,
+      "SEXO": pet.sexo,
+      "NASCIMENTO": pet.nascimento,
+      "PESO": pet.peso,
+      "IMAGEM": pet.imagem,
     }).then((_) {
       return true;
     }).catchError((error) {

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pet_care/components/button_components.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
+import 'package:pet_care/controllers/login_controller.dart';
 import 'package:sizer/sizer.dart';
 
 class ConfigScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class ConfigScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loginController = Get.put(LoginController());
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
 
@@ -56,53 +58,64 @@ class ConfigScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 2.h,
-                    ),
-                    SizedBox(
-                      width: queryData.size.width,
-                      child: CustomButton(
-                        onPressed: () {
-                          Get.defaultDialog(
-                            title: "Tem certeza que deseja excluir esta conta?",
-                            titleStyle: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color: Colors.black,
-                                ),
-                            backgroundColor: Colors.white30,
-                            content: Center(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "Está ação irá deletar todos os seus dados, incluindo imagens e é irreversível.",
-                                    style:
-                                        Theme.of(context).textTheme.labelSmall,
-                                  ),
-                                ],
+                    loginController.uID.value != "DEFAULT"
+                        ? Column(
+                            children: [
+                              SizedBox(
+                                height: 2.h,
                               ),
-                            ),
-                            cancel: CustomButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              text: "Cancelar",
-                              color: Colors.red,
-                            ),
-                            confirm: CustomButton(
-                              onPressed: () {
-                                Get.offAllNamed("/loading",
-                                    arguments: {'delete': true, 'sair': false});
-                              },
-                              text: "Confirmar",
-                            ),
-                          );
-                        },
-                        text: "DELETAR CONTA",
-                        color: Colors.white30,
-                      ),
-                    ),
+                              SizedBox(
+                                width: queryData.size.width,
+                                child: CustomButton(
+                                  onPressed: () {
+                                    Get.defaultDialog(
+                                      title:
+                                          "Tem certeza que deseja excluir esta conta?",
+                                      titleStyle: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(
+                                            color: Colors.black,
+                                          ),
+                                      backgroundColor: Colors.white30,
+                                      content: Center(
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              "Está ação irá deletar todos os seus dados, incluindo imagens e é irreversível.",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelSmall,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      cancel: CustomButton(
+                                        onPressed: () {
+                                          Get.back();
+                                        },
+                                        text: "Cancelar",
+                                        color: Colors.red,
+                                      ),
+                                      confirm: CustomButton(
+                                        onPressed: () {
+                                          Get.offAllNamed("/loading",
+                                              arguments: {
+                                                'delete': true,
+                                                'sair': false
+                                              });
+                                        },
+                                        text: "Confirmar",
+                                      ),
+                                    );
+                                  },
+                                  text: "DELETAR CONTA",
+                                  color: Colors.white30,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Container(),
                     SizedBox(
                       width: queryData.size.width,
                       child: CustomButton(

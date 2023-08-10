@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pet_care/controllers/login_controller.dart';
+import 'package:pet_care/controllers/pets_controller.dart';
+import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/screens/cadastros/cadastro_carteirinha_screen.dart';
 import 'package:pet_care/screens/cadastros/cadastro_pet_screen.dart';
 import 'package:pet_care/screens/carteirinha/carteirinha_screen.dart';
@@ -22,6 +24,7 @@ import 'package:sizer/sizer.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 bool salvarAcesso = false;
+bool saindo = false;
 
 class Main extends StatelessWidget {
   const Main({Key? key}) : super(key: key);
@@ -77,18 +80,36 @@ class Main extends StatelessWidget {
   }
 }
 
-void handleAuthStateChanges(User? firebaseUser) {
-  if (firebaseUser != null) {
-    Future.delayed(Duration.zero, () async {
-      final loginController = Get.put(LoginController());
-      loginController.uID.value = firebaseUser.uid;
-      Get.offAllNamed("/loading", arguments: {'delete': false, 'sair': false});
-    });
+void handleAuthStateChanges(User? firebaseUser) async {
+  final loginController = Get.put(LoginController());
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  saindo = prefs.getBool("saindo") ?? false;
+  if (saindo) {
+    Get.offAllNamed("/login");
   } else {
-    Get.offAllNamed(
-      '/login',
-    );
+    if (firebaseUser != null) {
+      Future.delayed(Duration.zero, () async {
+        loginController.uID.value = firebaseUser.uid;
+        carregarControllers();
+
+        Get.offAllNamed("/loading",
+            arguments: {'delete': false, 'sair': false});
+      });
+    } else {
+      loginController.logarSemConta();
+    }
   }
+}
+
+carregarControllers() async {
+  final loginController = Get.put(LoginController());
+  final versaoController = Get.put(VersaoController());
+  final petsController = Get.put(PetsController());
+
+  await versaoController.obterVersao(loginController.uID.value);
+  await petsController.carregarPets(loginController.uID.value);
+  Get.offAllNamed('/home');
 }
 
 void main() async {
@@ -97,6 +118,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // await FirebaseApi().initNotifications();
+
   initializeDateFormatting('pt_BR', null).then((_) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     runApp(const Main());

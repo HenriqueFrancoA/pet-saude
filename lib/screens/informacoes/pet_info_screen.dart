@@ -24,24 +24,33 @@ class PetInfoScreenState extends State<PetInfoScreen> {
   final pet = Get.arguments['pet'] as Pets;
 
   RxBool anuncio = RxBool(true);
-  late final BannerAd myBanner;
+  BannerAd? myBanner;
 
   @override
   void initState() {
     myBanner = BannerAd(
-      size: AdSize.fluid,
-      adUnitId: 'ca-app-pub-4824022930012497/6424498738',
+      size: AdSize.banner,
+      adUnitId: 'ca-app-pub-4824022930012497/7800151399',
       listener: BannerAdListener(
         onAdClosed: (ad) {
           setState(() {
-            anuncio.value = false;
+            ad.dispose();
+            myBanner = null;
           });
+        },
+        onAdOpened: (Ad ad) {
+          setState(() {
+            ad.dispose();
+            myBanner = null;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
         },
       ),
       request: const AdRequest(),
-    );
+    )..load();
 
-    myBanner.load();
     super.initState();
   }
 
@@ -308,29 +317,33 @@ class PetInfoScreenState extends State<PetInfoScreen> {
             ],
           ),
         ),
-        bottomSheet: FutureBuilder<bool>(
-          future: hasInternet(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
-                height: 0,
-              );
-            } else if (snapshot.data == true) {
-              return Container(
-                width: queryData.size.width,
-                height: 50,
-                color: Colors.black,
-                child: AdWidget(
-                  ad: myBanner,
-                ),
-              );
-            } else {
-              return Container(
-                height: 0,
-              );
-            }
-          },
-        ),
+        bottomSheet: myBanner != null
+            ? Stack(
+                children: [
+                  Container(
+                    width: queryData.size.width,
+                    height: 50,
+                    color: Colors.black,
+                    child: AdWidget(
+                      ad: myBanner!,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        myBanner!.dispose();
+                        myBanner = null;
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 16,
+                    ),
+                  ),
+                ],
+              )
+            : null,
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 class Pets {
   String? id;
+  int? idLocal;
   String? nome;
   String? raca;
   String? sexo;
@@ -14,6 +15,7 @@ class Pets {
 
   Pets({
     this.id,
+    this.idLocal,
     this.nome,
     this.raca,
     this.sexo,
@@ -39,7 +41,8 @@ class Pets {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'id': idLocal,
+      'id_firebase': id,
       'nome': nome,
       'raca': raca,
       'sexo': sexo,
@@ -58,7 +61,8 @@ class Pets {
     date = dateFormat.parse(map['nascimento']);
     final timeNascimento = Timestamp.fromDate(date);
     return Pets(
-      id: map['id'],
+      idLocal: map['id'],
+      id: map['id_firebase'],
       nome: map['nome'],
       raca: map['raca'],
       sexo: map['sexo'],

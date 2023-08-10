@@ -15,19 +15,20 @@ class VacinasDAO {
   Future<int> updateVacina(Vacinas vacina) async {
     final db = await DatabaseHelper().database;
     return await db.update('tb_vacinas', vacina.toMap(),
-        where: 'id = ?', whereArgs: [vacina.id]);
+        where: 'id_vacina = ?', whereArgs: [vacina.id]);
   }
 
-  Future<int> deleteVacina(String id) async {
+  Future<int> deleteVacina(int id) async {
     final db = await DatabaseHelper().database;
-    return await db.delete('tb_vacinas', where: 'id = ?', whereArgs: [id]);
+    return await db
+        .delete('tb_vacinas', where: 'id_vacina = ?', whereArgs: [id]);
   }
 
-  Future<List<Vacinas>> getVacinasByPetId(String petId) async {
+  Future<List<Vacinas>> getVacinasByPetId(int petId) async {
     final db = await DatabaseHelper().database;
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-      'SELECT * FROM tb_vacinas v INNER JOIN tb_pets p ON v.pet_id = p.id WHERE v.pet_id = ?',
-      [petId],
+      'SELECT * FROM tb_vacinas v INNER JOIN tb_pets p ON v.pet_local_id = p.id WHERE v.pet_local_id = ?',
+      [petId.toString()],
     );
     return List.generate(maps.length, (index) => Vacinas.fromMap(maps[index]));
   }

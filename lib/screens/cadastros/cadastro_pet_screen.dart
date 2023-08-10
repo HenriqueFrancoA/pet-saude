@@ -10,7 +10,6 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:pet_care/apis/pets_api.dart';
 import 'package:pet_care/components/button_components.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/components/input_component.dart';
@@ -21,7 +20,6 @@ import 'package:pet_care/models/pets.dart';
 import 'package:sizer/sizer.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
-import 'package:path_provider/path_provider.dart';
 
 class CadastroPetScreen extends StatefulWidget {
   const CadastroPetScreen({Key? key}) : super(key: key);
@@ -35,16 +33,7 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
 
   late Reference storageRef;
   RxString downloadURL = ''.obs;
-  String localImagePath = '';
   final dateFormat = DateFormat('dd/MM/yyyy');
-
-  void baixarImage() {
-    String ref = pet!.imagem!;
-    storageRef = FirebaseStorage.instance.ref().child(ref);
-    storageRef.getDownloadURL().then((url) {
-      downloadURL.value = url;
-    });
-  }
 
   final _nomeController = TextEditingController();
   final _dataController = TextEditingController();
@@ -79,33 +68,6 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
     }
   }
 
-  Future<String> saveToLocalFile(File? imageFile, Pets novopet) async {
-    Directory? appDocumentsDirectory = await getApplicationDocumentsDirectory();
-    final directoryPath = Directory("${appDocumentsDirectory.path}/pets");
-    await directoryPath.create(recursive: true);
-
-    localImagePath = "${appDocumentsDirectory.path}/pets/${novopet.id}.png";
-
-    try {
-      if (imageFile != null) {
-        await imageFile.copy(localImagePath);
-        novopet.localImagem = localImagePath;
-      }
-    } catch (e) {
-      print(e);
-    }
-    if (imagemSelecionada) {
-      novopet.imagem = 'pets/${novopet.id}.png';
-    } else {
-      novopet.imagem = 'pets/pet.png';
-    }
-    if (pet == null) {
-      petsController.criarPet(novopet);
-    }
-
-    return localImagePath;
-  }
-
   Future<File?> cropImage(XFile imagePath) async {
     final imageCropper = ImageCropper();
     croppedImage = await imageCropper.cropImage(
@@ -128,35 +90,6 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
     return croppedImage;
   }
 
-  Future<UploadTask?> upload(String path, String idPet) async {
-    File file = File(path);
-    try {
-      ref = 'pets/$idPet.png';
-      final storageRef = FirebaseStorage.instance.ref();
-      storageRef.child(ref).delete();
-      return storageRef.child(ref).putFile(
-            file,
-            SettableMetadata(
-              cacheControl: "public, max-age=600",
-              contentType: "image/png",
-              customMetadata: {
-                "user": "123",
-              },
-            ),
-          );
-    } on FirebaseException catch (e) {
-      throw Exception('Erro no upload: ${e.code}');
-    }
-  }
-
-  pickAndUploadImage(Pets pet) async {
-    File? file = croppedImage;
-    if (file != null) {
-      await upload(file.path, pet.id!);
-    }
-    await saveToLocalFile(file, pet);
-  }
-
   @override
   initState() {
     if (pet != null) {
@@ -166,7 +99,6 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
       _dataController.text = date;
       _pesoController.text = pet!.peso.toString();
       _racaController.text = pet!.raca!;
-      baixarImage();
     } else {
       _nomeController.text = '';
       _racaController.text = '';
@@ -325,8 +257,7 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                                   showTitleActions: true,
                                   minTime:
                                       DateTime(DateTime.now().year - 20, 1, 1),
-                                  maxTime: DateTime(
-                                      DateTime.now().year + 10, 12, 31),
+                                  maxTime: DateTime.now(),
                                   onConfirm: (date) {
                                     setState(() {
                                       _selectedDate = date;
@@ -450,61 +381,25 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                                               .parse(_dataController.text);
                                           final timestamp =
                                               Timestamp.fromDate(date);
-                                          pickAndUploadImage(pet!);
                                           Pets petAtualizado;
-                                          if (imagemSelecionada &&
-                                              pet!.imagem!
-                                                  .contains("pet.png")) {
-                                            PetsApi.atualizarPet(
-                                              pet!.id!,
-                                              _nomeController.text,
-                                              _racaController.text,
-                                              sexoPet.value,
-                                              timestamp,
-                                              double.parse(
-                                                  _pesoController.text),
-                                              'pets/${pet!.id}.png',
-                                            );
-                                            petAtualizado = Pets(
-                                              id: pet!.id!,
-                                              nome: _nomeController.text,
-                                              raca: _racaController.text,
-                                              sexo: sexoPet.value,
-                                              nascimento: timestamp,
-                                              peso: double.parse(
-                                                  _pesoController.text),
-                                              imagem: 'pets/${pet!.id}.png',
-                                              tutor: pet!.tutor,
-                                              localImagem: localImagePath,
-                                            );
-                                          } else {
-                                            PetsApi.atualizarPet(
-                                              pet!.id!,
-                                              _nomeController.text,
-                                              _racaController.text,
-                                              sexoPet.value,
-                                              timestamp,
-                                              double.parse(
-                                                  _pesoController.text),
-                                              pet!.imagem!,
-                                            );
-                                            petAtualizado = Pets(
-                                              id: pet!.id!,
-                                              nome: _nomeController.text,
-                                              raca: _racaController.text,
-                                              sexo: sexoPet.value,
-                                              nascimento: timestamp,
-                                              peso: double.parse(
-                                                  _pesoController.text),
-                                              imagem: pet!.imagem!,
-                                              tutor: pet!.tutor,
-                                              localImagem: pet!.localImagem,
-                                            );
-                                          }
-                                          versaoController.atualizarVersao();
+                                          petAtualizado = Pets(
+                                            id: pet!.id,
+                                            idLocal: pet!.idLocal,
+                                            nome: _nomeController.text,
+                                            raca: _racaController.text,
+                                            sexo: sexoPet.value,
+                                            nascimento: timestamp,
+                                            peso: double.parse(
+                                                _pesoController.text),
+                                            imagem: pet!.imagem,
+                                            tutor: pet!.tutor,
+                                            localImagem: pet!.localImagem,
+                                          );
 
-                                          petsController
-                                              .atualizarPet(petAtualizado);
+                                          petsController.atualizarPet(
+                                              petAtualizado,
+                                              imagemSelecionada,
+                                              croppedImage);
                                           Get.offNamed('/home');
                                         } catch (e) {
                                           showTopSnackBar(
@@ -558,37 +453,18 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                                               .parse(_dataController.text);
                                           final timestamp =
                                               Timestamp.fromDate(date);
-                                          PetsApi.criarPet(
-                                                  _nomeController.text,
-                                                  _racaController.text,
-                                                  sexoPet.value,
-                                                  timestamp,
-                                                  double.parse(
-                                                      _pesoController.text),
-                                                  loginController.uID.value)
-                                              .then((String id) {
-                                            Pets novoPet;
-                                            novoPet = Pets(
-                                              id: id,
-                                              nome: _nomeController.text,
-                                              raca: _racaController.text,
-                                              sexo: sexoPet.value,
-                                              nascimento: timestamp,
-                                              peso: double.parse(
-                                                  _pesoController.text),
-                                              tutor: loginController.uID.value,
-                                              localImagem: localImagePath,
-                                            );
-                                            pickAndUploadImage(novoPet);
-                                            if (imagemSelecionada) {
-                                              PetsApi.atualizarImagem(
-                                                  id, 'pets/$id.png');
-                                            } else {
-                                              PetsApi.atualizarImagem(
-                                                  id, 'pets/pet.png');
-                                            }
-                                          });
-                                          versaoController.atualizarVersao();
+                                          Pets novoPet;
+                                          novoPet = Pets(
+                                            nome: _nomeController.text,
+                                            raca: _racaController.text,
+                                            sexo: sexoPet.value,
+                                            nascimento: timestamp,
+                                            peso: double.parse(
+                                                _pesoController.text),
+                                            tutor: loginController.uID.value,
+                                          );
+                                          petsController.criarPet(novoPet,
+                                              imagemSelecionada, croppedImage);
 
                                           Get.offNamed('/home');
                                         } catch (e) {

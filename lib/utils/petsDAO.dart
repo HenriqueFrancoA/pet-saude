@@ -14,8 +14,8 @@ class PetsDAO {
 
   Future<int> updatePet(Pets pet) async {
     final db = await DatabaseHelper().database;
-    return await db
-        .update('tb_pets', pet.toMap(), where: 'id = ?', whereArgs: [pet.id]);
+    return await db.update('tb_pets', pet.toMap(),
+        where: 'id = ?', whereArgs: [pet.idLocal]);
   }
 
   Future<int> deletePet(String id) async {
@@ -28,5 +28,10 @@ class PetsDAO {
     final List<Map<String, dynamic>> maps =
         await db.query('tb_pets', where: 'tutor = ?', whereArgs: [tutor]);
     return List.generate(maps.length, (index) => Pets.fromMap(maps[index]));
+  }
+
+  Future<void> excluirBanco() {
+    final db = DatabaseHelper();
+    return db.deleteAndCloseDatabase();
   }
 }

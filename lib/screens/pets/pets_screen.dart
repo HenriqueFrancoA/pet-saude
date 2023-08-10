@@ -24,23 +24,33 @@ class PetsScreenState extends State<PetsScreen> {
   final loginController = Get.put(LoginController());
   final petsController = Get.put(PetsController());
   RxBool anuncio = RxBool(true);
-  late final BannerAd myBanner;
+  BannerAd? myBanner;
 
   @override
   void initState() {
     myBanner = BannerAd(
       size: AdSize.banner,
-      adUnitId:
-          'ca-app-pub-4824022930012497/6424498738', // test: 'ca-app-pub-3940256099942544/6300978111', //ca-app-pub-4824022930012497/6424498738
+      adUnitId: 'ca-app-pub-4824022930012497/6424498738',
       listener: BannerAdListener(
         onAdClosed: (ad) {
-          anuncio.value = false;
+          setState(() {
+            ad.dispose();
+            myBanner = null;
+          });
+        },
+        onAdOpened: (Ad ad) {
+          setState(() {
+            ad.dispose();
+            myBanner = null;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
         },
       ),
       request: const AdRequest(),
-    );
+    )..load();
 
-    myBanner.load();
     super.initState();
   }
 
@@ -99,7 +109,7 @@ class PetsScreenState extends State<PetsScreen> {
                       ),
                     ),
                     Container(
-                      height: queryData.size.height * 0.65,
+                      height: queryData.size.height * 0.63,
                       margin: const EdgeInsets.all(10),
                       child: Obx(
                         () => petsController.pets.isNotEmpty
@@ -154,7 +164,7 @@ class PetsScreenState extends State<PetsScreen> {
                       ],
                     ),
                     SizedBox(
-                      height: 2.h,
+                      height: 4.h,
                     ),
                   ],
                 ),
@@ -162,14 +172,31 @@ class PetsScreenState extends State<PetsScreen> {
             ],
           ),
         ),
-        bottomSheet: anuncio.isTrue
-            ? Container(
-                width: queryData.size.width,
-                height: 50,
-                color: Colors.black,
-                child: AdWidget(
-                  ad: myBanner,
-                ),
+        bottomSheet: myBanner != null
+            ? Stack(
+                children: [
+                  Container(
+                    width: queryData.size.width,
+                    height: 50,
+                    color: Colors.black,
+                    child: AdWidget(
+                      ad: myBanner!,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        myBanner!.dispose();
+                        myBanner = null;
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 16,
+                    ),
+                  ),
+                ],
               )
             : null,
       ),

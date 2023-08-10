@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pet_care/controllers/login_controller.dart';
 import 'package:pet_care/services/auth_services.dart';
 import 'package:sizer/sizer.dart';
 
@@ -15,14 +17,11 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
+
+    final loginController = Get.put(LoginController());
 
     return WillPopScope(
       onWillPop: () {
@@ -83,7 +82,7 @@ class LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: queryData.size.width,
                     child: MaterialButton(
-                      onPressed: () {
+                      onPressed: () async {
                         try {
                           AuthService().signInWithGoogle();
                         } catch (e) {
@@ -118,6 +117,27 @@ class LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 1.h,
+                  ),
+                  Text(
+                    "Ou",
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  SizedBox(
+                    height: 1.h,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      loginController.logarSemConta();
+                    },
+                    child: Text(
+                      "CONTINUE SEM FAZER LOGIN",
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ),
                   SizedBox(

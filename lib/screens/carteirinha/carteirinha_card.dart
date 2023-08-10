@@ -120,7 +120,9 @@ class CarteirinhaCardState extends State<CarteirinhaCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.vacina!.nome!,
+                        widget.vacina!.nome!.length <= 30
+                            ? widget.vacina!.nome!
+                            : "${widget.vacina!.nome!.substring(0, 30)}...",
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       Text(

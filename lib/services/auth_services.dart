@@ -14,6 +14,10 @@ class AuthService {
     );
 
     await SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('saindo', false);
+    });
+
+    await SharedPreferences.getInstance().then((prefs) {
       prefs.setBool('salvarAcesso', true);
     });
 
@@ -43,6 +47,7 @@ class AuthService {
     await SharedPreferences.getInstance().then((prefs) {
       prefs.remove('salvarAcesso');
       prefs.remove('versao');
+      prefs.remove('token');
     });
   }
 
@@ -55,6 +60,7 @@ class AuthService {
         final prefs = await SharedPreferences.getInstance();
         prefs.remove('salvarAcesso');
         prefs.remove('versao');
+        prefs.remove('token');
 
         await GoogleSignIn().signOut();
 

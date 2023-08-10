@@ -3,7 +3,8 @@ import 'package:intl/intl.dart' as intl;
 import 'package:pet_care/models/pets.dart';
 
 class Vermifugos {
-  String? id;
+  String? idFirebase;
+  int? id;
   String? nome;
   double? peso;
   double? dose;
@@ -11,9 +12,11 @@ class Vermifugos {
   Timestamp? proximaVacinacao;
   String? imagem;
   Pets? pet;
+  Pets? localPet;
   String? localImagem;
 
   Vermifugos({
+    this.idFirebase,
     this.id,
     this.nome,
     this.peso,
@@ -22,13 +25,14 @@ class Vermifugos {
     this.proximaVacinacao,
     this.imagem,
     this.pet,
+    this.localPet,
     this.localImagem,
   });
 
   factory Vermifugos.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     return Vermifugos(
-      id: snapshot.id,
+      idFirebase: snapshot.id,
       nome: data['NOME'],
       peso: data['PESO'],
       dose: data['DOSE'],
@@ -42,15 +46,16 @@ class Vermifugos {
   Map<String, dynamic> toMap() {
     final intl.DateFormat dateFormat = intl.DateFormat('dd/MM/yyyy', 'pt_BR');
     return {
-      'id': id,
-      'nome': nome,
-      'peso': peso,
+      'id_vermifugo': id,
+      'id_vermifugo_firebase': idFirebase,
+      'nome_vermifugo': nome,
+      'peso_vermifugo': peso,
       'dose': dose,
       'data_vacinacao': dateFormat.format(dataVacinacao!.toDate()),
       'proxima_vacinacao': dateFormat.format(proximaVacinacao!.toDate()),
-      'imagem': imagem,
-      'pet_id': pet!.id,
-      'local_imagem': localImagem,
+      'imagem_vermifugo': imagem,
+      'pet_local_id': localPet!.idLocal,
+      'local_imagem_vermifugo': localImagem,
     };
   }
 
@@ -64,30 +69,32 @@ class Vermifugos {
     date = dateFormat.parse(map['nascimento']);
     final nascimento = Timestamp.fromDate(date);
     return Vermifugos(
-      id: map['id'],
-      nome: map['nome'],
-      peso: map['peso'],
+      id: map['id_vermifugo'],
+      idFirebase: map['id_firebase'],
+      nome: map['nome_vermifugo'],
+      peso: map['peso_vermifugo'],
       dose: map['dose'],
       dataVacinacao: timeVacinacao,
       proximaVacinacao: timeProxima,
-      imagem: map['imagem'],
-      pet: Pets(
-        id: map['id:1'],
-        nome: map['nome:1'],
+      imagem: map['imagem_vermifugo'],
+      localPet: Pets(
+        idLocal: map['id'],
+        id: map['id_firebase'],
+        nome: map['nome'],
         raca: map['raca'],
         sexo: map['sexo'],
         nascimento: nascimento,
-        peso: map['peso:1'],
-        imagem: map['imagem:1'],
+        peso: map['peso'],
+        imagem: map['imagem'],
         tutor: map['tutor'],
-        localImagem: map['local_imagem:1'],
+        localImagem: map['local_imagem'],
       ),
-      localImagem: map['local_imagem'],
+      localImagem: map['local_imagem_vermifugo'],
     );
   }
 
   Vermifugos.fromJson(Map<String, dynamic> json) {
-    id = json['ID'];
+    idFirebase = json['ID'];
     nome = json['NOME'];
     peso = json['PESO'];
     dose = json['DOSE'];
@@ -99,7 +106,7 @@ class Vermifugos {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['ID'] = id;
+    data['ID'] = idFirebase;
     data['NOME'] = nome;
     data['PESO'] = peso;
     data['DOSE'] = dose;

@@ -4,11 +4,13 @@ class Versao {
   String? id;
   String? uId;
   int? versao;
+  String? dispositivoToken;
 
   Versao({
     this.id,
     this.uId,
     this.versao,
+    this.dispositivoToken,
   });
 
   factory Versao.fromSnapshot(DocumentSnapshot snapshot) {
@@ -17,6 +19,7 @@ class Versao {
       id: snapshot.id,
       uId: data['UID'],
       versao: data['VERSAO'],
+      dispositivoToken: data['DISPOSITIVO_TOKEN'],
     );
   }
 
@@ -25,6 +28,7 @@ class Versao {
       'id': id,
       'uid': uId,
       'versao': versao,
+      'dispositivoToken': dispositivoToken,
     };
   }
 
@@ -33,6 +37,7 @@ class Versao {
       id: map['id'],
       uId: map['uid'],
       versao: map['versao'],
+      dispositivoToken: map['dispositivoToken'],
     );
   }
 
@@ -40,6 +45,7 @@ class Versao {
     id = json['ID'];
     uId = json['UID'];
     versao = json['VERSAO'];
+    dispositivoToken = json['DISPOSITIVO_TOKEN'];
   }
 
   Map<String, dynamic> toJson() {
@@ -47,6 +53,7 @@ class Versao {
     data['ID'] = id;
     data['UID'] = uId;
     data['VERSAO'] = versao;
+    data['DISPOSITIVO_TOKEN'] = dispositivoToken;
 
     return data;
   }

@@ -4,22 +4,15 @@ import 'package:pet_care/models/pets.dart';
 import 'package:pet_care/models/vacinas.dart';
 
 abstract class VacinasApi {
-  static Future<String> criarVacina(
-    String nome,
-    double peso,
-    double dose,
-    Timestamp dataVacinacao,
-    Timestamp proximaVacinacao,
-    String idPet,
-  ) async {
+  static Future<String> criarVacina(Vacinas vacina) async {
     var db = FirebaseFirestore.instance;
     VacinasDTO vacinas = VacinasDTO(
-      nome: nome,
-      peso: peso,
-      dose: dose,
-      dataVacinacao: dataVacinacao,
-      proximaVacinacao: proximaVacinacao,
-      pet: db.doc("PETS/$idPet"),
+      nome: vacina.nome,
+      peso: vacina.peso,
+      dose: vacina.dose,
+      dataVacinacao: vacina.dataVacinacao,
+      proximaVacinacao: vacina.proximaVacinacao,
+      pet: db.doc("PETS/${vacina.pet!.id}"),
     );
     try {
       DocumentReference doc =
@@ -74,7 +67,7 @@ abstract class VacinasApi {
 
           Map<String, dynamic> dataServico = doc.data() as Map<String, dynamic>;
           Vacinas? vacinas = Vacinas(
-            id: doc.id,
+            idFirebase: doc.id,
             nome: dataServico['NOME'],
             peso: dataServico['PESO'],
             dose: dataServico['DOSE'],
@@ -82,6 +75,7 @@ abstract class VacinasApi {
             proximaVacinacao: dataServico['PROXIMA_VACINACAO'],
             imagem: dataServico['IMAGEM'],
             pet: pet,
+            localPet: pet,
           );
 
           listPets.add(vacinas);

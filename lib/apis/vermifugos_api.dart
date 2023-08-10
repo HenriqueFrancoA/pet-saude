@@ -4,22 +4,15 @@ import 'package:pet_care/models/pets.dart';
 import 'package:pet_care/models/vermifugos.dart';
 
 abstract class VermifugosApi {
-  static Future<String> criarVermifugo(
-    String nome,
-    double peso,
-    double dose,
-    Timestamp dataVacinacao,
-    Timestamp proximaVacinacao,
-    String idPet,
-  ) async {
+  static Future<String> criarVermifugo(Vermifugos vermifugos) async {
     var db = FirebaseFirestore.instance;
     VermifugosDTO vermifugo = VermifugosDTO(
-      nome: nome,
-      peso: peso,
-      dose: dose,
-      dataVacinacao: dataVacinacao,
-      proximaVacinacao: proximaVacinacao,
-      pet: db.doc("PETS/$idPet"),
+      nome: vermifugos.nome,
+      peso: vermifugos.peso,
+      dose: vermifugos.dose,
+      dataVacinacao: vermifugos.dataVacinacao,
+      proximaVacinacao: vermifugos.proximaVacinacao,
+      pet: db.doc("PETS/${vermifugos.pet!.id}"),
     );
     try {
       DocumentReference doc =
@@ -74,7 +67,7 @@ abstract class VermifugosApi {
 
           Map<String, dynamic> dataServico = doc.data() as Map<String, dynamic>;
           Vermifugos? vermifugos = Vermifugos(
-            id: doc.id,
+            idFirebase: doc.id,
             nome: dataServico['NOME'],
             peso: dataServico['PESO'],
             dose: dataServico['DOSE'],
@@ -82,6 +75,7 @@ abstract class VermifugosApi {
             proximaVacinacao: dataServico['PROXIMA_VACINACAO'],
             imagem: dataServico['IMAGEM'],
             pet: pet,
+            localPet: pet,
           );
 
           listPets.add(vermifugos);

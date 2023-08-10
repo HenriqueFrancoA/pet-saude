@@ -55,8 +55,8 @@ class CardPetState extends State<CardPet> {
                   ),
                 ),
                 onTap: () {
-                  vacinasController.obterVacinas(widget.pet!.id!);
-                  vermifugosController.obterVermifugo(widget.pet!.id!);
+                  vacinasController.obterVacinas(widget.pet!.idLocal);
+                  vermifugosController.obterVermifugo(widget.pet!.idLocal);
                   Get.toNamed("/info", arguments: {'pet': widget.pet});
                 },
               ),

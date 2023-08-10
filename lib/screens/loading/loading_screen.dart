@@ -7,6 +7,7 @@ import 'package:pet_care/controllers/vacinas_controller.dart';
 import 'package:pet_care/controllers/vermifugos_controller.dart';
 import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/services/auth_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -68,30 +69,38 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
   }
 
-  carregarControllers() async {
-    await versaoController.obterVersao(loginController.uID.value);
-    await petsController.carregarPets(loginController.uID.value);
-    Get.offAllNamed('/home');
-  }
-
   deletarControllers() async {
-    vacinasController.deletarVacinas();
-    vermifugosController.deletarVermifugos();
-    petsController.deletarPets();
-    versaoController.deletarVersao();
+    await vacinasController.deletarVacinas(false);
+    await vermifugosController.deletarVermifugos(false);
+    await petsController.deletarPets(false);
+    await versaoController.deletarVersao(false);
     loginController.uID.value = "";
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('saindo', true);
+    });
     AuthService().deleteAccount();
-    Get.offAllNamed("/login");
   }
 
   limparControllers() async {
-    vacinasController.vacinas.clear();
-    vermifugosController.vermifugos.clear();
-    petsController.pets.clear();
-    versaoController.deletarVersao();
+    await vacinasController.deletarVacinas(true);
+    await vermifugosController.deletarVermifugos(true);
+    await petsController.deletarPets(true);
+    if (loginController.uID.value != "DEFAULT") {
+      versaoController.deletarVersao(true);
+      await SharedPreferences.getInstance().then((prefs) {
+        prefs.setBool('saindo', true);
+      });
+      AuthService().signOut();
+    }
     loginController.uID.value = "";
-    AuthService().signOut();
     Get.offAllNamed("/login");
+  }
+
+  carregarControllers() async {
+    if (loginController.uID.value == "DEFAULT") {
+      await petsController.carregarPets(loginController.uID.value);
+      Get.offAllNamed('/home');
+    }
   }
 
   @override
