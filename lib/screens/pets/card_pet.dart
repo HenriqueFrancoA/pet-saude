@@ -9,6 +9,7 @@ import 'package:pet_care/controllers/vermifugos_controller.dart';
 import 'package:pet_care/models/pets.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class CardPet extends StatefulWidget {
   Pets? pet;
   bool ultimo;
