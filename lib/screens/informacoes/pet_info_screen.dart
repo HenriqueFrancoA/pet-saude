@@ -284,7 +284,7 @@ class PetInfoScreenState extends State<PetInfoScreen> {
                       ],
                     ),
                   ),
-                  isBannerClosed
+                  !isBannerClosed
                       ? BannerComponent(
                           onBannerClosed: () {
                             setState(() {
