@@ -9,6 +9,7 @@ import 'package:pet_care/models/vacinas.dart';
 import 'package:pet_care/models/vermifugos.dart';
 import 'package:sizer/sizer.dart';
 
+// ignore: must_be_immutable
 class CarteirinhaCard extends StatefulWidget {
   Vermifugos? vermifugo;
   Vacinas? vacina;

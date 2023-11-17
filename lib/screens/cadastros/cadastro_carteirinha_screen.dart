@@ -125,6 +125,7 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                 opacity: 0.5,
                 child: LottieBuilder.asset(
                   "assets/image/wpp.json",
+                  repeat: false,
                   width: queryData.size.width,
                   height: queryData.size.height,
                   fit: BoxFit.cover,

@@ -131,6 +131,7 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                 opacity: 0.5,
                 child: LottieBuilder.asset(
                   "assets/image/wpp.json",
+                  repeat: false,
                   width: queryData.size.width,
                   height: queryData.size.height,
                   fit: BoxFit.cover,

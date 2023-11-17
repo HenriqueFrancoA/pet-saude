@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pet_care/components/banner_components.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/models/pets.dart';
 import 'package:sizer/sizer.dart';
@@ -20,39 +20,10 @@ class PetInfoScreen extends StatefulWidget {
   PetInfoScreenState createState() => PetInfoScreenState();
 }
 
+bool isBannerClosed = false;
+
 class PetInfoScreenState extends State<PetInfoScreen> {
   final pet = Get.arguments['pet'] as Pets;
-
-  RxBool anuncio = RxBool(true);
-  BannerAd? myBanner;
-
-  @override
-  void initState() {
-    myBanner = BannerAd(
-      size: AdSize.banner,
-      adUnitId: 'ca-app-pub-4824022930012497/7800151399',
-      listener: BannerAdListener(
-        onAdClosed: (ad) {
-          setState(() {
-            ad.dispose();
-            myBanner = null;
-          });
-        },
-        onAdOpened: (Ad ad) {
-          setState(() {
-            ad.dispose();
-            myBanner = null;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          ad.dispose();
-        },
-      ),
-      request: const AdRequest(),
-    )..load();
-
-    super.initState();
-  }
 
   Future<bool> hasInternet() async {
     var connectivityResult = await Connectivity().checkConnectivity();
@@ -82,6 +53,7 @@ class PetInfoScreenState extends State<PetInfoScreen> {
                   "assets/image/wpp.json",
                   width: queryData.size.width,
                   height: queryData.size.height,
+                  repeat: false,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -312,38 +284,20 @@ class PetInfoScreenState extends State<PetInfoScreen> {
                       ],
                     ),
                   ),
+                  isBannerClosed
+                      ? BannerComponent(
+                          onBannerClosed: () {
+                            setState(() {
+                              isBannerClosed = true;
+                            });
+                          },
+                        )
+                      : Container(),
                 ],
               ),
             ],
           ),
         ),
-        bottomSheet: myBanner != null
-            ? Stack(
-                children: [
-                  Container(
-                    width: queryData.size.width,
-                    height: 50,
-                    color: Colors.black,
-                    child: AdWidget(
-                      ad: myBanner!,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        myBanner!.dispose();
-                        myBanner = null;
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 16,
-                    ),
-                  ),
-                ],
-              )
-            : null,
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   RxString uID = RxString('');
+  RxString token = RxString('');
 
   logarSemConta() async {
     await SharedPreferences.getInstance().then((prefs) {

@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static final String _databaseName = "topservicedb6.db";
+  static final String _databaseName = "petsaude.db";
   static final int _databaseVersion = 1;
 
   static Database? _database;

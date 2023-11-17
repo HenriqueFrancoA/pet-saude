@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pet_care/components/dialog_components.dart';
 import 'package:pet_care/controllers/login_controller.dart';
 import 'package:pet_care/services/auth_services.dart';
 import 'package:sizer/sizer.dart';
@@ -82,10 +83,11 @@ class LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: queryData.size.width,
                     child: MaterialButton(
-                      onPressed: () async {
+                      onPressed: () {
                         try {
                           AuthService().signInWithGoogle();
                         } catch (e) {
+                          print(e);
                           null;
                         }
                       },
@@ -142,6 +144,25 @@ class LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(
                     height: 5.h,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return PolicyDialog(
+                            mdFileName: 'privacy_policy.md',
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      "Política de Privacidade",
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 1.h,
                   ),
                 ],
               ),

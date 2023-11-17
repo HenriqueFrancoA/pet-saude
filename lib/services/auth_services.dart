@@ -4,28 +4,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   Future<void> signInWithGoogle() async {
-    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+    try {
+      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
-    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+      final GoogleSignInAuthentication gAuth = await gUser!.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: gAuth.accessToken,
-      idToken: gAuth.idToken,
-    );
+      final credential = GoogleAuthProvider.credential(
+        accessToken: gAuth.accessToken,
+        idToken: gAuth.idToken,
+      );
 
-    await SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool('saindo', false);
-    });
+      await SharedPreferences.getInstance().then((prefs) {
+        prefs.setBool('saindo', false);
+      });
 
-    await SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool('salvarAcesso', true);
-    });
+      await SharedPreferences.getInstance().then((prefs) {
+        prefs.setBool('salvarAcesso', true);
+      });
 
-    await SharedPreferences.getInstance().then((prefs) {
-      prefs.setInt('versao', 0);
-    });
-
-    await FirebaseAuth.instance.signInWithCredential(credential);
+      await SharedPreferences.getInstance().then((prefs) {
+        prefs.setInt('versao', 0);
+      });
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      print(e);
+    }
   }
 
   Future<bool> isLogged() async {

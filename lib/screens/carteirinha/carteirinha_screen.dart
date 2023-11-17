@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pet_care/components/banner_components.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/controllers/vacinas_controller.dart';
 import 'package:pet_care/controllers/vermifugos_controller.dart';
@@ -21,42 +21,14 @@ class CarteirinhaScreen extends StatefulWidget {
   CarteirinhaScreenState createState() => CarteirinhaScreenState();
 }
 
+bool isBannerClosed = false;
+
 class CarteirinhaScreenState extends State<CarteirinhaScreen> {
   final titulo = Get.arguments['titulo'] as String;
   final pet = Get.arguments['pet'] as Pets;
 
   final vacinasController = Get.put(VacinasController());
   final vermifugosController = Get.put(VermifugosController());
-  RxBool anuncio = RxBool(true);
-  BannerAd? myBanner;
-
-  @override
-  void initState() {
-    myBanner = BannerAd(
-      size: AdSize.banner,
-      adUnitId: 'ca-app-pub-4824022930012497/8830162038',
-      listener: BannerAdListener(
-        onAdClosed: (ad) {
-          setState(() {
-            ad.dispose();
-            myBanner = null;
-          });
-        },
-        onAdOpened: (Ad ad) {
-          setState(() {
-            ad.dispose();
-            myBanner = null;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          ad.dispose();
-        },
-      ),
-      request: const AdRequest(),
-    )..load();
-
-    super.initState();
-  }
 
   Future<bool> hasInternet() async {
     var connectivityResult = await Connectivity().checkConnectivity();
@@ -85,6 +57,7 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
                 child: LottieBuilder.asset(
                   "assets/image/wpp.json",
                   width: queryData.size.width,
+                  repeat: false,
                   height: queryData.size.height,
                   fit: BoxFit.cover,
                 ),
@@ -130,7 +103,7 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.all(15),
-                    height: queryData.size.height * 0.9,
+                    height: 90.h - 60,
                     child: Obx(
                       () => ListView.separated(
                         itemCount: titulo.contains("VERMÍFUGOS")
@@ -159,38 +132,20 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
                       ),
                     ),
                   ),
+                  !isBannerClosed
+                      ? BannerComponent(
+                          onBannerClosed: () {
+                            setState(() {
+                              isBannerClosed = true;
+                            });
+                          },
+                        )
+                      : Container(),
                 ],
               ),
             ],
           ),
         ),
-        bottomSheet: myBanner != null
-            ? Stack(
-                children: [
-                  Container(
-                    width: queryData.size.width,
-                    height: 50,
-                    color: Colors.black,
-                    child: AdWidget(
-                      ad: myBanner!,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        myBanner!.dispose();
-                        myBanner = null;
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 16,
-                    ),
-                  ),
-                ],
-              )
-            : null,
       ),
     );
   }

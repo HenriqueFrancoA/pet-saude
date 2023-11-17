@@ -89,15 +89,18 @@ void handleAuthStateChanges(User? firebaseUser) async {
     Get.offAllNamed("/login");
   } else {
     if (firebaseUser != null) {
-      Future.delayed(Duration.zero, () async {
-        loginController.uID.value = firebaseUser.uid;
-        carregarControllers();
+      //Future.delayed(Duration.zero, () async {
+      loginController.uID.value = firebaseUser.uid;
+      carregarControllers();
 
-        Get.offAllNamed("/loading",
-            arguments: {'delete': false, 'sair': false});
-      });
+      Get.offAllNamed("/loading", arguments: {'delete': false, 'sair': false});
+      //});
     } else {
-      loginController.logarSemConta();
+      if (salvarAcesso) {
+        loginController.logarSemConta();
+      } else {
+        Get.offAllNamed("/login");
+      }
     }
   }
 }

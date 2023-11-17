@@ -28,6 +28,7 @@ class ConfigScreen extends StatelessWidget {
               child: LottieBuilder.asset(
                 "assets/image/wpp.json",
                 width: queryData.size.width,
+                repeat: false,
                 height: queryData.size.height,
                 fit: BoxFit.cover,
               ),
