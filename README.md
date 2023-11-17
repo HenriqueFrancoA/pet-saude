@@ -32,7 +32,7 @@ themes: Configurações de tema e estilo.
 utils: Funções utilitárias como banco de dados local e helper.
 
 ## Uso
-![Login](/assets/image/readme02.gif)   ![Infos](/assets/image/readme02.gif)
+![Login](/assets/image/readme01.gif)   ![Infos](/assets/image/readme02.gif)
 
 
 ## Contribuição
