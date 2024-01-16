@@ -37,4 +37,4 @@ utils: Funções utilitárias como banco de dados local e helper.
 
 ## Contribuição
 Caso tenha alguma sugestão ou dúvida, me mande um e-mail. 
-henrriquefrancoaraujo@gmail.com
+henriquefrancoaraujo@gmail.com
