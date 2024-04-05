@@ -15,7 +15,7 @@ Para rodar o aplicativo em sua máquina, você precisará ter o [FLUTTER](https:
 Na sua pasta de escolha use o comando para clonar o repositório e baixar as dependências do projeto:
 ```
 git clone https://github.com/rick5678/pet-care.git
-cd controlador-de-tarefas
+cd pet-saude
 flutter pub get
 flutter run
 ```
