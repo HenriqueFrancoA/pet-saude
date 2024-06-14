@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pet_care/apis/vermifugos_api.dart';
+import 'package:pet_care/components/notification_snack_bar.dart';
 import 'package:pet_care/controllers/login_controller.dart';
 import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/models/pets.dart';
@@ -76,7 +80,11 @@ class VermifugosController extends GetxController {
   }
 
   Future<String> saveToLocalFile(
-      File? imageFile, Vermifugos vermifugo, bool imagemSelecionada) async {
+    File? imageFile,
+    Vermifugos vermifugo,
+    bool imagemSelecionada,
+    BuildContext context,
+  ) async {
     Directory? appDocumentsDirectory = await getApplicationDocumentsDirectory();
     final directoryPath = Directory("${appDocumentsDirectory.path}/vermifugos");
     await directoryPath.create(recursive: true);
@@ -97,19 +105,28 @@ class VermifugosController extends GetxController {
         localImagePath = '';
       }
     } catch (e) {
-      print(e);
+      NotificationSnackbar.showError(context, "Ocorreu algum erro.");
     }
 
     return localImagePath;
   }
 
   pickAndUploadImage(
-      Vermifugos vermifugo, File? croppedImage, bool imagemSelecionada) async {
+    Vermifugos vermifugo,
+    File? croppedImage,
+    bool imagemSelecionada,
+    BuildContext context,
+  ) async {
     File? file = croppedImage;
     if (file != null && vermifugo.idFirebase != null) {
       await upload(file.path, vermifugo.idFirebase!);
     }
-    await saveToLocalFile(file, vermifugo, imagemSelecionada);
+    await saveToLocalFile(
+      file,
+      vermifugo,
+      imagemSelecionada,
+      context,
+    );
   }
 
   carregarVermifugos(Pets pet) async {
@@ -123,8 +140,12 @@ class VermifugosController extends GetxController {
     isLoading.value = false;
   }
 
-  criarVermifugo(Vermifugos novoVermifugo, File? croppedImage,
-      bool imagemSelecionada) async {
+  criarVermifugo(
+    Vermifugos novoVermifugo,
+    File? croppedImage,
+    bool imagemSelecionada,
+    BuildContext context,
+  ) async {
     if (loginController.uID.value != "DEFAULT") {
       await VermifugosApi.criarVermifugo(novoVermifugo).then((String id) {
         novoVermifugo.idFirebase = id;
@@ -138,7 +159,8 @@ class VermifugosController extends GetxController {
     }
     int idVermifugo = await vermifugosDAO.insertVermifugo(novoVermifugo);
     novoVermifugo.id = idVermifugo;
-    await pickAndUploadImage(novoVermifugo, croppedImage, imagemSelecionada);
+    await pickAndUploadImage(
+        novoVermifugo, croppedImage, imagemSelecionada, context);
     novoVermifugo.localImagem = localImagePath;
     vermifugosDAO.updateVermifugo(novoVermifugo);
     vermifugos.add(novoVermifugo);

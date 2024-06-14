@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pet_care/apis/vacinas_api.dart';
+import 'package:pet_care/components/notification_snack_bar.dart';
 import 'package:pet_care/controllers/login_controller.dart';
 import 'package:pet_care/controllers/versao_controller.dart';
 import 'package:pet_care/models/pets.dart';
@@ -74,7 +78,11 @@ class VacinasController extends GetxController {
   }
 
   Future<String> saveToLocalFile(
-      File? imageFile, Vacinas vacina, bool imagemSelecionada) async {
+    File? imageFile,
+    Vacinas vacina,
+    bool imagemSelecionada,
+    BuildContext context,
+  ) async {
     Directory? appDocumentsDirectory = await getApplicationDocumentsDirectory();
     final directoryPath = Directory("${appDocumentsDirectory.path}/vacinas");
     await directoryPath.create(recursive: true);
@@ -94,19 +102,23 @@ class VacinasController extends GetxController {
         localImagePath = '';
       }
     } catch (e) {
-      print(e);
+      NotificationSnackbar.showError(context, "Ocorreu algum erro.");
     }
 
     return localImagePath;
   }
 
   pickAndUploadImage(
-      Vacinas vacina, File? croppedImage, bool imagemSelecionada) async {
+    Vacinas vacina,
+    File? croppedImage,
+    bool imagemSelecionada,
+    BuildContext context,
+  ) async {
     File? file = croppedImage;
     if (file != null && vacina.idFirebase != null) {
       await upload(file.path, vacina.idFirebase!);
     }
-    await saveToLocalFile(file, vacina, imagemSelecionada);
+    await saveToLocalFile(file, vacina, imagemSelecionada, context);
   }
 
   carregarVacinas(Pets pet) async {
@@ -121,7 +133,11 @@ class VacinasController extends GetxController {
   }
 
   criarVacina(
-      Vacinas novaVacina, File? croppedImage, bool imagemSelecionada) async {
+    Vacinas novaVacina,
+    File? croppedImage,
+    bool imagemSelecionada,
+    BuildContext context,
+  ) async {
     if (loginController.uID.value != "DEFAULT") {
       await VacinasApi.criarVacina(novaVacina).then((String id) {
         novaVacina.idFirebase = id;
@@ -135,7 +151,12 @@ class VacinasController extends GetxController {
     }
     int idVacina = await vacinasDAO.insertVacina(novaVacina);
     novaVacina.id = idVacina;
-    await pickAndUploadImage(novaVacina, croppedImage, imagemSelecionada);
+    await pickAndUploadImage(
+      novaVacina,
+      croppedImage,
+      imagemSelecionada,
+      context,
+    );
     novaVacina.localImagem = localImagePath;
     vacinasDAO.updateVacina(novaVacina);
     vacinas.add(novaVacina);

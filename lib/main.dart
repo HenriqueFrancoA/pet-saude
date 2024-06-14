@@ -26,6 +26,11 @@ import 'package:intl/date_symbol_data_local.dart';
 bool salvarAcesso = false;
 bool saindo = false;
 
+late final FirebaseApp app;
+late final FirebaseAuth auth;
+
+final loginController = Get.put(LoginController());
+
 class Main extends StatelessWidget {
   const Main({Key? key}) : super(key: key);
 
@@ -81,27 +86,15 @@ class Main extends StatelessWidget {
 }
 
 void handleAuthStateChanges(User? firebaseUser) async {
-  final loginController = Get.put(LoginController());
-
   SharedPreferences prefs = await SharedPreferences.getInstance();
   saindo = prefs.getBool("saindo") ?? false;
   if (saindo) {
     Get.offAllNamed("/login");
   } else {
-    if (firebaseUser != null) {
-      //Future.delayed(Duration.zero, () async {
-      loginController.uID.value = firebaseUser.uid;
-      carregarControllers();
+    loginController.uID.value = firebaseUser!.uid;
+    carregarControllers();
 
-      Get.offAllNamed("/loading", arguments: {'delete': false, 'sair': false});
-      //});
-    } else {
-      if (salvarAcesso) {
-        loginController.logarSemConta();
-      } else {
-        Get.offAllNamed("/login");
-      }
-    }
+    Get.offAllNamed("/loading", arguments: {'delete': false, 'sair': false});
   }
 }
 
@@ -115,12 +108,14 @@ carregarControllers() async {
   Get.offAllNamed('/home');
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
-  await Firebase.initializeApp(
+  app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  auth = FirebaseAuth.instanceFor(app: app);
+
   // await FirebaseApi().initNotifications();
 
   initializeDateFormatting('pt_BR', null).then((_) {
@@ -131,5 +126,14 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   salvarAcesso = prefs.getBool("salvarAcesso") ?? false;
 
-  FirebaseAuth.instance.authStateChanges().listen(handleAuthStateChanges);
+  final firebaseUser = FirebaseAuth.instance.currentUser;
+  if (firebaseUser != null) {
+    handleAuthStateChanges(firebaseUser);
+  } else {
+    if (salvarAcesso) {
+      loginController.logarSemConta();
+    } else {
+      Get.offAllNamed("/login");
+    }
+  }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -78,7 +80,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     await SharedPreferences.getInstance().then((prefs) {
       prefs.setBool('saindo', true);
     });
-    AuthService().deleteAccount();
+    AuthService().deleteAccount(context);
   }
 
   limparControllers() async {

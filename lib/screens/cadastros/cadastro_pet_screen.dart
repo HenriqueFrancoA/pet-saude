@@ -114,10 +114,8 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
     queryData = MediaQuery.of(context);
     final isKeyboard = queryData.viewInsets.bottom != 0;
 
-    return WillPopScope(
-      onWillPop: () async {
-        return true;
-      },
+    return PopScope(
+      canPop: true,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.black,
@@ -398,9 +396,11 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                                           );
 
                                           petsController.atualizarPet(
-                                              petAtualizado,
-                                              imagemSelecionada,
-                                              croppedImage);
+                                            petAtualizado,
+                                            imagemSelecionada,
+                                            croppedImage,
+                                            context,
+                                          );
                                           Get.offNamed('/home');
                                         } catch (e) {
                                           showTopSnackBar(
@@ -464,8 +464,12 @@ class CadastroPetScreenState extends State<CadastroPetScreen> {
                                                 _pesoController.text),
                                             tutor: loginController.uID.value,
                                           );
-                                          petsController.criarPet(novoPet,
-                                              imagemSelecionada, croppedImage);
+                                          petsController.criarPet(
+                                            novoPet,
+                                            imagemSelecionada,
+                                            croppedImage,
+                                            context,
+                                          );
 
                                           Get.offNamed('/home');
                                         } catch (e) {

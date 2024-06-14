@@ -88,22 +88,18 @@ class FirebaseApi {
   }
 
   Future<void> scheduleNotification(DateTime nextVacinaDate) async {
-    // Defina a data da notificação, três dias antes da próxima vacina
-    final notificationDate = nextVacinaDate.subtract(Duration(days: 3));
+    final notificationDate = nextVacinaDate.subtract(const Duration(days: 3));
 
-    // Verifique se a data da notificação é no futuro
     if (notificationDate.isAfter(DateTime.now())) {
       tz.initializeTimeZones();
-      // Crie um objeto TZDateTime usando o fuso horário local do dispositivo
       final localNotificationTimeZone = tz.getLocation('America/Sao_Paulo');
       final tzNotificationDate =
           tz.TZDateTime.from(notificationDate, localNotificationTimeZone);
 
       final fcmToken = await firebaseMessaging.getToken();
 
-      // Agende a notificação usando o token FCM como ID único
       await localNotification.zonedSchedule(
-        fcmToken.hashCode, // Usando o hashCode do token como ID da notificação
+        fcmToken.hashCode,
         'Próxima vacina em 3 dias',
         'Não esqueça da próxima vacina em 3 dias!',
         tzNotificationDate,

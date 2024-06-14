@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
@@ -31,10 +29,8 @@ class PetsScreenState extends State<PetsScreen> {
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
 
-    return WillPopScope(
-      onWillPop: () {
-        exit(0);
-      },
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.black,

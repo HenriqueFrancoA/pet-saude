@@ -6,3 +6,13 @@
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
+
+<!--
+    //  _    _  ______ 
+    // | |  | ||  ____|
+    // | |__| || |__   
+    // |  __  ||  __|  
+    // | |  | || |     
+    // |_|  |_||_|     
+    //                 
+-->

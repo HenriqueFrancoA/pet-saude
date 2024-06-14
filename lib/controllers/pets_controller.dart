@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pet_care/apis/pets_api.dart';
+import 'package:pet_care/components/notification_snack_bar.dart';
 import 'package:pet_care/controllers/login_controller.dart';
 import 'package:pet_care/controllers/vacinas_controller.dart';
 import 'package:pet_care/controllers/vermifugos_controller.dart';
@@ -62,7 +66,11 @@ class PetsController extends GetxController {
   }
 
   Future<String> saveToLocalFile(
-      File? imageFile, Pets novopet, bool imagemSelecionada) async {
+    File? imageFile,
+    Pets novopet,
+    bool imagemSelecionada,
+    BuildContext context,
+  ) async {
     Directory? appDocumentsDirectory = await getApplicationDocumentsDirectory();
     final directoryPath = Directory("${appDocumentsDirectory.path}/pets");
     await directoryPath.create(recursive: true);
@@ -81,7 +89,7 @@ class PetsController extends GetxController {
         localImagePath = '';
       }
     } catch (e) {
-      print(e);
+      NotificationSnackbar.showError(context, "Ocorreu algum erro.");
     }
 
     return localImagePath!;
@@ -108,13 +116,13 @@ class PetsController extends GetxController {
     }
   }
 
-  pickAndUploadImage(
-      Pets pet, File? croppedImage, bool imagemSelecionada) async {
+  pickAndUploadImage(Pets pet, File? croppedImage, bool imagemSelecionada,
+      BuildContext context) async {
     File? file = croppedImage;
     if (file != null && pet.id != null) {
       await upload(file.path, pet.id!);
     }
-    await saveToLocalFile(file, pet, imagemSelecionada);
+    await saveToLocalFile(file, pet, imagemSelecionada, context);
   }
 
   carregarPets(String tutorId) async {
@@ -153,7 +161,8 @@ class PetsController extends GetxController {
     isLoading.value = false;
   }
 
-  atualizarPet(Pets pet, bool imagemSelecionada, File? croppedImage) async {
+  atualizarPet(Pets pet, bool imagemSelecionada, File? croppedImage,
+      BuildContext context) async {
     if (imagemSelecionada &&
         pet.imagem != null &&
         pet.imagem!.contains("pet.png") &&
@@ -169,7 +178,7 @@ class PetsController extends GetxController {
       versaoController.atualizarVersao();
     }
 
-    await pickAndUploadImage(pet, croppedImage, imagemSelecionada);
+    await pickAndUploadImage(pet, croppedImage, imagemSelecionada, context);
     if (pet.localImagem == null || pet.localImagem == "") {
       pet.localImagem = localImagePath;
     }
@@ -189,7 +198,12 @@ class PetsController extends GetxController {
     }
   }
 
-  criarPet(Pets novoPet, bool imagemSelecionada, File? croppedImage) async {
+  criarPet(
+    Pets novoPet,
+    bool imagemSelecionada,
+    File? croppedImage,
+    BuildContext context,
+  ) async {
     if (loginController.uID.value != "DEFAULT") {
       await PetsApi.criarPet(novoPet).then((String id) {
         novoPet.id = id;
@@ -203,7 +217,7 @@ class PetsController extends GetxController {
     }
     int idPet = await petsDAO.insertPet(novoPet);
     novoPet.idLocal = idPet;
-    await pickAndUploadImage(novoPet, croppedImage, imagemSelecionada);
+    await pickAndUploadImage(novoPet, croppedImage, imagemSelecionada, context);
     novoPet.localImagem = localImagePath;
     petsDAO.updatePet(novoPet);
     pets.add(novoPet);

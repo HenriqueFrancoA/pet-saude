@@ -39,10 +39,8 @@ class CarteirinhaScreenState extends State<CarteirinhaScreen> {
   Widget build(BuildContext context) {
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
-    return WillPopScope(
-      onWillPop: () async {
-        return true;
-      },
+    return PopScope(
+      canPop: true,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.black,

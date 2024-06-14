@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 import 'package:pet_care/components/button_components.dart';
 import 'package:pet_care/components/glassmorphic_component.dart';
 import 'package:pet_care/controllers/login_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class ConfigScreen extends StatelessWidget {
@@ -120,9 +121,12 @@ class ConfigScreen extends StatelessWidget {
                     SizedBox(
                       width: queryData.size.width,
                       child: CustomButton(
-                        onPressed: () {
+                        onPressed: () async {
                           Get.offAllNamed("/loading",
                               arguments: {'delete': false, 'sair': true});
+                          await SharedPreferences.getInstance().then((prefs) {
+                            prefs.setBool('salvarAcesso', false);
+                          });
                         },
                         text: "SAIR",
                         color: Colors.white30,

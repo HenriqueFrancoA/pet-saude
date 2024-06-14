@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
@@ -24,10 +22,8 @@ class LoginScreenState extends State<LoginScreen> {
 
     final loginController = Get.put(LoginController());
 
-    return WillPopScope(
-      onWillPop: () {
-        exit(0);
-      },
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Theme.of(context).colorScheme.background,
@@ -85,9 +81,8 @@ class LoginScreenState extends State<LoginScreen> {
                     child: MaterialButton(
                       onPressed: () {
                         try {
-                          AuthService().signInWithGoogle();
+                          AuthService().signInWithGoogle(context);
                         } catch (e) {
-                          print(e);
                           null;
                         }
                       },

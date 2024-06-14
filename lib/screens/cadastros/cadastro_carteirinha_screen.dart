@@ -109,10 +109,8 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
     queryData = MediaQuery.of(context);
     final isKeyboard = queryData.viewInsets.bottom != 0;
 
-    return WillPopScope(
-      onWillPop: () async {
-        return true;
-      },
+    return PopScope(
+      canPop: true,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.black,
@@ -395,9 +393,11 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                     );
 
                                     vermifugosController.criarVermifugo(
-                                        novoVermifugo,
-                                        croppedImage,
-                                        imagemSelecionada);
+                                      novoVermifugo,
+                                      croppedImage,
+                                      imagemSelecionada,
+                                      context,
+                                    );
 
                                     Get.back();
                                     Get.offNamed(
@@ -443,8 +443,12 @@ class CadastroCarteirinhaScreenState extends State<CadastroCarteirinhaScreen> {
                                       pet: pet,
                                       localPet: pet,
                                     );
-                                    vacinasController.criarVacina(novaVacina,
-                                        croppedImage, imagemSelecionada);
+                                    vacinasController.criarVacina(
+                                      novaVacina,
+                                      croppedImage,
+                                      imagemSelecionada,
+                                      context,
+                                    );
 
                                     Get.back();
                                     Get.offNamed(
