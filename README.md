@@ -23,13 +23,13 @@ flutter run
 ## Estrutura de Pastas
 O projeto está organizado com as seguintes pastas:
 
-apis: Aqui é onde usamos os metodos CRUD para o FIREBASE.
-components: Onde ficam os componentes que são reutilizádos.
-controllers: Controllers tomam conta das lógicas que são aplicadas e fazem o app se comunicar entre uma tela e outra (ou banco de dados local).
-models: Definições de dados e modelos.
-screens: Telas principais do aplicativo.
-themes: Configurações de tema e estilo.
-utils: Funções utilitárias como banco de dados local e helper.
+- apis: Aqui é onde usamos os metodos CRUD para o FIREBASE.
+- components: Onde ficam os componentes que são reutilizádos.
+- controllers: Controllers tomam conta das lógicas que são aplicadas e fazem o app se comunicar entre uma tela e outra (ou banco de dados local).
+- models: Definições de dados e modelos.
+- screens: Telas principais do aplicativo.
+- themes: Configurações de tema e estilo.
+- utils: Funções utilitárias como banco de dados local e helper.
 
 ## Uso
 ![Login](/assets/image/readme01.gif)   ![Infos](/assets/image/readme02.gif)
